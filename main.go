@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"go-slack/channels"
 )
 
 const PORT = 8080
@@ -18,11 +19,7 @@ func main() {
 
 func createServeMux() *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /channels", channelsList)
+	mux.HandleFunc("GET /channels", channels.ChannelsList)
 	mux.HandleFunc("/", http.NotFound)
 	return mux
-}
-
-func channelsList(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Channels"))
 }

@@ -5,21 +5,24 @@ import (
 	"net/http"
 )
 
+const PORT = 8080
+
 func main() {
 	mux := createServeMux()
-	fmt.Println("Server starting on port 8080...")
-	http.ListenAndServe(":8080", mux)
+
+	fmt.Printf("Server starting on port %d...", PORT)
+
+	servePort := fmt.Sprintf(":%d", PORT)
+	http.ListenAndServe(servePort, mux)
 }
 
 func createServeMux() *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.Handle("GET /channels", channelHandler{})
-	mux.Handle("/", http.NotFoundHandler())
+	mux.HandleFunc("GET /channels", channelsList)
+	mux.HandleFunc("/", http.NotFound)
 	return mux
 }
 
-type channelHandler struct{}
-
-func (h channelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func channelsList(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Channels"))
 }

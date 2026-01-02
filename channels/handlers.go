@@ -15,7 +15,7 @@ func writeJsonResponse(w http.ResponseWriter, data any) {
 }
 
 func ChannelsList(w http.ResponseWriter, r *http.Request) {
-	channels := []Channel {
+	channels := []Channel{
 		{"Main"},
 		{"Help"},
 	}

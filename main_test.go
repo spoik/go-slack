@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/json"
+	"go-slack/channels"
 	"net/http"
 	"testing"
-	"go-slack/channels"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -17,13 +16,11 @@ func TestRoot(t *testing.T) {
 
 func TestChannels(t *testing.T) {
 	respRec := MakeRequest(t, "GET", "/channels")
+	var channels []channels.Channel
+
+	DecodeJsonResponse(t, respRec, &channels)
 
 	assert.Equal(t, http.StatusOK, respRec.Code)
-
-	var channels []channels.Channel
-	err := json.Unmarshal(respRec.Body.Bytes(), &channels)
-
-	assert.NoError(t, err)
 	assert.Equal(t, channels[0].Name, "Main")
 	assert.Equal(t, channels[1].Name, "Help")
 }

@@ -3,6 +3,8 @@ package channels
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/uptrace/bun"
 )
 
 func writeJsonResponse(w http.ResponseWriter, data any) {
@@ -14,10 +16,14 @@ func writeJsonResponse(w http.ResponseWriter, data any) {
 	}
 }
 
-func ChannelsList(w http.ResponseWriter, r *http.Request) {
+type ChannelList struct {
+	DB *bun.DB
+}
+
+func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	channels := []Channel{
-		{"Main"},
-		{"Help"},
+		{1, "Main"},
+		{2, "Help"},
 	}
 
 	writeJsonResponse(w, channels)

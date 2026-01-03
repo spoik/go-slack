@@ -1,0 +1,22 @@
+services:
+  db:
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      interval: 1s
+      timeout: 1s
+      retries: 1
+
+  app-test:
+    build:
+      context: .
+      target: test
+    environment:
+      DB_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: go test
+
+volumes:
+  postgres_test_data:

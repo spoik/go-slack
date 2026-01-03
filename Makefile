@@ -1,5 +1,5 @@
-# include .env.dev
-# export
+include .env.dev
+export
 
 MIGRATE_CMD=cmd/migrations/main.go
 DOCKER_DEV=docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev

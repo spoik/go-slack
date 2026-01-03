@@ -19,14 +19,14 @@ func main() {
 
 	ctx := context.Background()
 
-	err := Run(db, ctx, os.Args[1:])
+	err := run(db, ctx, os.Args[1:])
 
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-func Run(db *bun.DB, ctx context.Context, args []string) error {
+func run(db *bun.DB, ctx context.Context, args []string) error {
 	migrator := migrate.NewMigrator(db, migrations.Migrations)
 
 	if len(args) == 0 {

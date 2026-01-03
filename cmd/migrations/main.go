@@ -44,12 +44,7 @@ func run(db *bun.DB, ctx context.Context, args []string) error {
 	case "status":
 		return status(migrator)
 	case "new":
-		if len(args) < 2 {
-			return fmt.Errorf("A name is required for the new migration.")
-		}
-
-		name := args[1:]
-		return createMigration(migrator, ctx, name)
+		return createMigration(migrator, ctx, args[1:])
 	default:
 		return fmt.Errorf("Unknown \"%s\" migration command", cmd)
 	}
@@ -118,8 +113,12 @@ func status(migrator *migrate.Migrator) error {
 	return nil
 }
 
-func createMigration(migrator *migrate.Migrator, ctx context.Context, name_args []string) error {
-	name := strings.Join(name_args, "_")
+func createMigration(migrator *migrate.Migrator, ctx context.Context, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("A name is required for the new migration.")
+	}
+
+	name := strings.Join(args, "_")
 
 	mf, err := migrator.CreateGoMigration(ctx, name)
 

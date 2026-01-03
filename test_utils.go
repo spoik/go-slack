@@ -19,13 +19,10 @@ func createRequest(t *testing.T, method string, url string) *http.Request {
 	return req
 }
 
-func MakeRequest(t *testing.T, method string, url string) *httptest.ResponseRecorder {
-	mux := createServeMux()
+func MakeRequest(t *testing.T, mux *http.ServeMux, method string, url string) *httptest.ResponseRecorder {
 	respRec := httptest.NewRecorder()
 	req := createRequest(t, method, url)
-
 	mux.ServeHTTP(respRec, req)
-
 	return respRec
 }
 

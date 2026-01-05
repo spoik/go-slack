@@ -9,6 +9,7 @@ services:
     build:
       context: .
       target: dev
+    user: "${UID}:${GID}"
     ports:
       - "8080:8080"
     environment:

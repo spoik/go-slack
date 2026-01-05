@@ -2,7 +2,6 @@ package main
 
 import (
 	"go-slack/channels"
-	"go-slack/database"
 	"net/http"
 	"os"
 	"testing"
@@ -13,10 +12,10 @@ import (
 var mux *http.ServeMux
 
 func TestMain(m *testing.M) {
-	db := database.Connect()
-	defer db.Close()
+	// db := database.Connect()
+	// defer db.Close()
 
-	mux = createServeMux(db)
+	mux = createServeMux()
 
 	exitCode := m.Run()
 

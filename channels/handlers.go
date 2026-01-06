@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"go-slack/channels/queries"
+	"log"
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
@@ -32,7 +33,8 @@ func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	channels, err := c.queries.ListChannels(c.ctx)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("Unable to fetch channels from the database:", err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 

@@ -15,13 +15,18 @@ func writeJsonResponse(w http.ResponseWriter, data any) {
 	err := json.NewEncoder(w).Encode(data)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println("Unable to encode json:", err.Error())
+		genericInternalServerError(w)
 	}
+}
+
+func genericInternalServerError(w http.ResponseWriter) {
+	http.Error(w, "Something went wrong", http.StatusInternalServerError)
 }
 
 type ChannelList struct {
 	queries *queries.Queries
-	ctx context.Context
+	ctx     context.Context
 }
 
 func NewChannelList(ctx context.Context, db *pgx.Conn) *ChannelList {
@@ -34,7 +39,7 @@ func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Unable to fetch channels from the database:", err.Error())
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		genericInternalServerError(w)
 		return
 	}
 

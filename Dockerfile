@@ -17,5 +17,7 @@ CMD ["air"]
 
 # --- Test Stage ---
 FROM base AS test
+# Install migrate for database migrations
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4
 COPY . .
 

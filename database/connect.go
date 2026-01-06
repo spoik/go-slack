@@ -1,10 +1,14 @@
 package database
 
 import (
-	// "os"
+	"context"
+	"os"
 
+	"github.com/jackc/pgx/v5"
 )
 
-func Connect() {
-	// dsn := os.Getenv("DB_URL")
+func Connect(ctx context.Context) (*pgx.Conn, error) {
+	dsn := os.Getenv("DB_URL")
+
+	return pgx.Connect(ctx, dsn)
 }

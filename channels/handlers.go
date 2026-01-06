@@ -1,8 +1,12 @@
 package channels
 
 import (
+	"context"
 	"encoding/json"
+	"go-slack/channels/queries"
 	"net/http"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func writeJsonResponse(w http.ResponseWriter, data any) {
@@ -15,12 +19,21 @@ func writeJsonResponse(w http.ResponseWriter, data any) {
 }
 
 type ChannelList struct {
+	queries *queries.Queries
+	ctx context.Context
+}
+
+func NewChannelList(ctx context.Context, db *pgx.Conn) *ChannelList {
+	q := queries.New(db)
+	return &ChannelList{ctx: ctx, queries: q}
 }
 
 func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	channels := []Channel{
-		{1, "Main"},
-		{2, "Help"},
+	channels, err := c.queries.ListChannels(c.ctx)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	writeJsonResponse(w, channels)

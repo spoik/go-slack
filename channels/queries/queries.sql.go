@@ -9,6 +9,19 @@ import (
 	"context"
 )
 
+const createChannel = `-- name: CreateChannel :one
+INSERT INTO channels (name)
+VALUES ($1)
+RETURNING id, name
+`
+
+func (q *Queries) CreateChannel(ctx context.Context, name string) (Channel, error) {
+	row := q.db.QueryRow(ctx, createChannel, name)
+	var i Channel
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const listChannels = `-- name: ListChannels :many
 SELECT id, name FROM channels
 `

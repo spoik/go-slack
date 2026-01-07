@@ -26,16 +26,15 @@ func genericInternalServerError(w http.ResponseWriter) {
 
 type ChannelList struct {
 	queries *queries.Queries
-	ctx     context.Context
 }
 
 func NewChannelList(ctx context.Context, db *pgx.Conn) *ChannelList {
 	q := queries.New(db)
-	return &ChannelList{ctx: ctx, queries: q}
+	return &ChannelList{queries: q}
 }
 
 func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	channels, err := c.queries.ListChannels(c.ctx)
+	channels, err := c.queries.ListChannels(r.Context())
 
 	if err != nil {
 		log.Println("Unable to fetch channels from the database:", err.Error())

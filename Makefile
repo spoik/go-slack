@@ -12,8 +12,12 @@ down:
 	$(DOCKER_DEV) down
 shell:
 	$(DOCKER_DEV) exec app-dev sh
+test-up:
+	$(DOCKER_TEST) up --build -d
+test-down:
+	$(DOCKER_TEST) down
 test:
-	$(DOCKER_TEST) up --build --exit-code-from app-test
+	$(DOCKER_TEST) exec -T app-test go test ./...
 db-shell:
 	@export $$(cat .env.dev | xargs) && $(DOCKER_DEV) exec -it db psql -U $$DB_USER -d $$DB_NAME
 # Run database migrations

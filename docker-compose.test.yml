@@ -17,7 +17,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: go test
+    command: go test ./...
 
 volumes:
   postgres_test_data:

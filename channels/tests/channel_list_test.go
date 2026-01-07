@@ -1,7 +1,8 @@
-package main
+package tests
 
 import (
 	"context"
+	"go-slack/channels/queries"
 	"go-slack/testutils"
 	"log"
 	"net/http"
@@ -32,8 +33,16 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestRoot(t *testing.T) {
-	respRec := testutils.MakeRequest(t, mux, "GET", "/")
+func TestChannels(t *testing.T) {
+	respRec := testutils.MakeRequest(t, mux, "GET", "/channels")
+	var channels []queries.Channel
 
-	assert.Equal(t, http.StatusNotFound, respRec.Code)
+	testutils.DecodeJsonResponse(t, respRec, &channels)
+
+	assert.Equal(t, http.StatusOK, respRec.Code)
+	// assert.Equal(t, channels[0].ID, int64(1))
+	// assert.Equal(t, channels[0].Name, "Main")
+	//
+	// assert.Equal(t, channels[1].ID, int64(2))
+	// assert.Equal(t, channels[1].Name, "Help")
 }

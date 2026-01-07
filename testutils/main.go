@@ -1,13 +1,28 @@
-package main
+package testutils
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/jackc/pgx/v5"
+	"github.com/stretchr/testify/assert"
+	"go-slack/database"
+	"go-slack/httpserver"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
+
+func TestInit(ctx context.Context, m *testing.M) (*http.ServeMux, *pgx.Conn, error) {
+	db, err := database.Connect(ctx)
+
+	if err != nil {
+		fmt.Printf("Failed to connect to the database: %s", err)
+		return nil, nil, err
+	}
+
+	return httpserver.New(ctx, db), db, nil
+}
 
 func createRequest(t *testing.T, method string, url string) *http.Request {
 	req, err := http.NewRequest(method, url, nil)

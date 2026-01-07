@@ -2,9 +2,8 @@ package database
 
 import (
 	"context"
-	"os"
-
 	"github.com/jackc/pgx/v5"
+	"os"
 )
 
 func Connect(ctx context.Context) (*pgx.Conn, error) {

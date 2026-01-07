@@ -13,10 +13,11 @@ services:
       target: test
     environment:
       DB_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
+      GOCACHE: /tmp/.cache
     depends_on:
       db:
         condition: service_healthy
-    command: go test
+    command: go test ./...
 
 volumes:
   postgres_test_data:

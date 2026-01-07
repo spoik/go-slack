@@ -1,7 +1,5 @@
 services:
   db:
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -9,10 +7,12 @@ services:
     build:
       context: .
       target: dev
+    user: "${UID}:${GID}"
     ports:
       - "8080:8080"
     environment:
       DB_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
+      GOCACHE: /tmp/.cache
     volumes:
       - .:/app
     depends_on:

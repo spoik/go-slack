@@ -1,39 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"go-slack/channels"
-	"log"
-	"net/http"
-
+	"context"
 	"go-slack/database"
-
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/extra/bundebug"
+	"go-slack/httpserver"
+	"log"
 )
 
-const PORT = 8080
-
 func main() {
-	db := database.Connect()
-	defer db.Close()
-	// Add query logging for development
-	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
-	startMux(db)
-}
+	ctx := context.Background()
+	db, err := database.Connect(ctx)
 
-func startMux(db *bun.DB) {
-	mux := createServeMux(db)
+	if err != nil {
+		log.Printf("Failed to connect to the database: %e\n", err)
+		return
+	}
 
-	log.Printf("Server starting on port %d...", PORT)
-
-	servePort := fmt.Sprintf(":%d", PORT)
-	http.ListenAndServe(servePort, mux)
-}
-
-func createServeMux(db *bun.DB) *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.Handle("GET /channels", channels.ChannelList{DB: db})
-	mux.HandleFunc("/", http.NotFound)
-	return mux
+	defer db.Close(ctx)
+	httpserver.StartNew(ctx, db)
 }

@@ -9,10 +9,15 @@ RUN go mod download
 FROM base AS dev
 # Install Air for hot reloading
 RUN go install github.com/air-verse/air@latest
+# Install migrate for database migrations
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4
 COPY . .
 # Air will handle the building and running of the binary via hotreloading
 CMD ["air"]
 
 # --- Test Stage ---
 FROM base AS test
+# Install migrate for database migrations
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4
 COPY . .
+

@@ -23,7 +23,9 @@ func (q *Queries) CreateChannel(ctx context.Context, name string) (Channel, erro
 }
 
 const listChannels = `-- name: ListChannels :many
-SELECT id, name FROM channels
+SELECT id, name
+FROM channels
+ORDER BY name ASC
 `
 
 func (q *Queries) ListChannels(ctx context.Context) ([]Channel, error) {

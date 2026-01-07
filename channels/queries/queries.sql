@@ -1,5 +1,7 @@
 -- name: ListChannels :many
-SELECT * FROM channels;
+SELECT *
+FROM channels
+ORDER BY name ASC;
 
 -- name: CreateChannel :one
 INSERT INTO channels (name)

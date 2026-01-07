@@ -1,17 +1,16 @@
 package testutils
 
 import (
+	"context"
 	"github.com/jackc/pgx/v5"
 	"net/http"
 	"net/http/httptest"
-	"context"
 	"testing"
 )
 
 type TestServer struct {
 	mux *http.ServeMux
 	db  *pgx.Conn
-	ctx context.Context
 }
 
 func (ts TestServer) MakeRequest(t *testing.T, method string, url string) *httptest.ResponseRecorder {
@@ -21,7 +20,7 @@ func (ts TestServer) MakeRequest(t *testing.T, method string, url string) *httpt
 	return respRec
 }
 
-func (ts TestServer)createRequest(t *testing.T, method string, url string) *http.Request {
+func (ts TestServer) createRequest(t *testing.T, method string, url string) *http.Request {
 	req, err := http.NewRequest(method, url, nil)
 
 	if err != nil {
@@ -31,6 +30,7 @@ func (ts TestServer)createRequest(t *testing.T, method string, url string) *http
 	return req
 }
 
-func (ts TestServer) CleanUp() {
-	ts.db.Close(ts.ctx)
+// Should be called before TestMain returns.
+func (ts TestServer) CleanUp(ctx context.Context) {
+	ts.db.Close(ctx)
 }

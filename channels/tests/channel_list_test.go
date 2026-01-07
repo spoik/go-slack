@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 		return
 	}
 
-	defer ts.CleanUp()
+	defer ts.CleanUp(ctx)
 
 	exitCode := m.Run()
 	os.Exit(exitCode)

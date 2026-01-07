@@ -23,7 +23,6 @@ func TestInit(ctx context.Context) (*TestServer, error) {
 	ts := TestServer{
 		mux: mux,
 		db:  db,
-		ctx: ctx,
 	}
 	return &ts, nil
 }

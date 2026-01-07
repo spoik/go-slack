@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
 	"go-slack/testutils"
 	"log"
 	"net/http"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var ts *testutils.TestServer
@@ -24,7 +23,7 @@ func TestMain(m *testing.M) {
 		return
 	}
 
-	defer ts.CleanUp()
+	defer ts.CleanUp(ctx)
 
 	exitCode := m.Run()
 	os.Exit(exitCode)

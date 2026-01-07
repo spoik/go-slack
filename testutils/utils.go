@@ -1,30 +1,24 @@
 package testutils
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/assert"
-	"go-slack/database"
-	"go-slack/httpserver"
+	"go-slack/testutils/testrunner"
+	"log"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
-func TestInit(ctx context.Context) (*TestServer, error) {
-	db, err := database.Connect(ctx)
+func TestInit() *testrunner.TestRunner {
+	tr, err := testrunner.New()
 
 	if err != nil {
-		fmt.Printf("Failed to connect to the database: %s", err)
-		return nil, err
+		log.Println("Failed to initialize tests:", err.Error())
+		os.Exit(1)
 	}
 
-	mux := httpserver.New(ctx, db)
-	ts := TestServer{
-		mux: mux,
-		db:  db,
-	}
-	return &ts, nil
+	return tr
 }
 
 func DecodeJsonResponse(t *testing.T, respRec *httptest.ResponseRecorder, data any) {

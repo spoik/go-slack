@@ -1,34 +1,20 @@
 package tests
 
 import (
-	"context"
+	"github.com/stretchr/testify/assert"
 	"go-slack/channels/queries"
 	"go-slack/testutils"
-	"log"
+	"go-slack/testutils/testserver"
 	"net/http"
-	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-var ts *testutils.TestServer
+var ts *testserver.TestServer
 
 func TestMain(m *testing.M) {
-	ctx := context.Background()
-
-	var err error
-	ts, err = testutils.TestInit(ctx)
-
-	if err != nil {
-		log.Println("Failed to initialize tests:", err.Error())
-		return
-	}
-
-	defer ts.CleanUp(ctx)
-
-	exitCode := m.Run()
-	os.Exit(exitCode)
+	tr := testutils.TestInit()
+	ts = tr.TestServer()
+	tr.Run(m)
 }
 
 func TestChannels(t *testing.T) {

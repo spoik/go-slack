@@ -9,32 +9,30 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-var mux *http.ServeMux
+var ts *testutils.TestServer
 
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 
 	var err error
-	var db *pgx.Conn
-	mux, db, err = testutils.TestInit(ctx, m)
-
-	defer db.Close(ctx)
+	ts, err = testutils.TestInit(ctx)
 
 	if err != nil {
 		log.Println("Failed to initialize tests:", err.Error())
 		return
 	}
 
+	defer ts.CleanUp()
+
 	exitCode := m.Run()
 	os.Exit(exitCode)
 }
 
 func TestChannels(t *testing.T) {
-	respRec := testutils.MakeRequest(t, mux, "GET", "/channels")
+	respRec := ts.MakeRequest(t, "GET", "/channels")
 	var channels []queries.Channel
 
 	testutils.DecodeJsonResponse(t, respRec, &channels)

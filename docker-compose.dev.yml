@@ -5,7 +5,7 @@ services:
 
   app-dev:
     build:
-      context: .
+      context: ./backend
       target: dev
     user: "${UID}:${GID}"
     ports:
@@ -14,7 +14,7 @@ services:
       DB_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
       GOCACHE: /tmp/.cache
     volumes:
-      - .:/app
+      - ./backend/:/app
     depends_on:
       db:
         condition: service_healthy

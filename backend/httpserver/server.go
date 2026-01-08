@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const PORT = 8080
+const PORT = 8000
 
 func StartNew(ctx context.Context, db *pgx.Conn) {
 	mux := New(ctx, db)

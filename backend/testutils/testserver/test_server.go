@@ -13,12 +13,10 @@ type TestServer struct {
 	mux *http.ServeMux
 }
 
-func New(ctx context.Context, db *pgxpool.Pool) (*TestServer, error) {
+func New(ctx context.Context, db *pgxpool.Pool) *TestServer {
 	mux := httpserver.NewMux(ctx, db)
-
 	ts := TestServer{mux: mux}
-
-	return &ts, nil
+	return &ts
 }
 
 func (ts TestServer) MakeRequest(t *testing.T, method string, url string) *httptest.ResponseRecorder {

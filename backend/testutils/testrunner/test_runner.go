@@ -21,42 +21,28 @@ func New() (*TestRunner, error) {
 	db, err := connectToDb(ctx)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to connect to database: %w", err)
 	}
 
-	ts, err := createTestServer(ctx, db)
+	ts := testserver.New(ctx, db)
 
-	if err != nil {
-		db.Close()
-		return nil, err
-	}
-
-	return &TestRunner{
+	tr := &TestRunner{
 		ctx: ctx,
 		db:  db,
 		ts:  ts,
-	}, nil
+	}
+
+	return tr, nil
 }
 
 func connectToDb(ctx context.Context) (*pgxpool.Pool, error) {
 	db, err := database.NewDBPool(ctx, os.Getenv("DB_URL"))
 
 	if err != nil {
-		return nil, fmt.Errorf("Failed to connect to the database: %s", err)
+		return nil, fmt.Errorf("Failed to connect to the database: %w", err)
 	}
 
 	return db, nil
-}
-
-func createTestServer(ctx context.Context, db *pgxpool.Pool) (*testserver.TestServer, error) {
-	ts, err := testserver.New(ctx, db)
-
-	if err != nil {
-		db.Close()
-		return nil, fmt.Errorf("Failed to create test server: %s", err)
-	}
-
-	return ts, nil
 }
 
 // Run all the tests in the test file.
@@ -67,9 +53,9 @@ func (tr TestRunner) Run(m *testing.M) {
 }
 
 // Create and run a test.
-func (tr TestRunner) Test(f func()) {
+func (tr TestRunner) Test(test func()) {
 	defer tr.ClearDbData()
-	f()
+	test()
 }
 
 func (tr TestRunner) TestServer() *testserver.TestServer {

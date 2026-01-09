@@ -16,11 +16,11 @@ func writeJsonResponse(w http.ResponseWriter, data any) {
 
 	if err != nil {
 		slog.Error("Unable to encode json", "error", err)
-		genericInternalServerError(w)
+		internalServerError(w)
 	}
 }
 
-func genericInternalServerError(w http.ResponseWriter) {
+func internalServerError(w http.ResponseWriter) {
 	http.Error(w, "Something went wrong", http.StatusInternalServerError)
 }
 
@@ -38,7 +38,7 @@ func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		slog.Error("Unable to fetch channels from the database", "error", err)
-		genericInternalServerError(w)
+		internalServerError(w)
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"go-slack/database"
 	"go-slack/testutils/testserver"
 	"os"
 	"testing"
@@ -36,7 +35,7 @@ func New() (*TestRunner, error) {
 }
 
 func connectToDb(ctx context.Context) (*pgxpool.Pool, error) {
-	db, err := database.NewDBPool(ctx, os.Getenv("DB_URL"))
+	db, err := pgxpool.New(ctx, os.Getenv("DB_URL"))
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to connect to the database: %w", err)

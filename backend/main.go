@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"go-slack/config"
-	"go-slack/database"
 	"go-slack/httpserver"
 	"log/slog"
 	"net/http"
@@ -60,7 +59,7 @@ func initConfig() *config.Config {
 }
 
 func initDb(ctx context.Context, cfg *config.Config) *pgxpool.Pool {
-	db, err := database.NewDBPool(ctx, cfg.DB_URL)
+	db, err := pgxpool.New(ctx, cfg.DB_URL)
 
 	if err != nil {
 		slog.Error("Failed to connect to the database", "error", err)

@@ -2,7 +2,7 @@ package testserver
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go-slack/httpserver"
 	"net/http"
 	"net/http/httptest"
@@ -13,8 +13,8 @@ type TestServer struct {
 	mux *http.ServeMux
 }
 
-func New(ctx context.Context, db *pgx.Conn) (*TestServer, error) {
-	mux := httpserver.New(ctx, db)
+func New(ctx context.Context, db *pgxpool.Pool) (*TestServer, error) {
+	mux := httpserver.NewMux(ctx, db)
 
 	ts := TestServer{mux: mux}
 

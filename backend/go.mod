@@ -3,6 +3,7 @@ module go-slack
 go 1.25.5
 
 require (
+	github.com/caarlos0/env/v10 v10.0.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/stretchr/testify v1.11.1
 )

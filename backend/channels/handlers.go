@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"go-slack/channels/queries"
-	"log"
+	"log/slog"
 	"net/http"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func writeJsonResponse(w http.ResponseWriter, data any) {
@@ -15,7 +15,7 @@ func writeJsonResponse(w http.ResponseWriter, data any) {
 	err := json.NewEncoder(w).Encode(data)
 
 	if err != nil {
-		log.Println("Unable to encode json:", err.Error())
+		slog.Error("Unable to encode json", "error", err)
 		genericInternalServerError(w)
 	}
 }
@@ -28,7 +28,7 @@ type ChannelList struct {
 	queries *queries.Queries
 }
 
-func NewChannelList(ctx context.Context, db *pgx.Conn) *ChannelList {
+func NewChannelList(ctx context.Context, db *pgxpool.Pool) *ChannelList {
 	q := queries.New(db)
 	return &ChannelList{queries: q}
 }
@@ -37,7 +37,7 @@ func (c ChannelList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	channels, err := c.queries.ListChannels(r.Context())
 
 	if err != nil {
-		log.Println("Unable to fetch channels from the database:", err.Error())
+		slog.Error("Unable to fetch channels from the database", "error", err)
 		genericInternalServerError(w)
 		return
 	}

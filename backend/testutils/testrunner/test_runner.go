@@ -3,7 +3,7 @@ package testrunner
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go-slack/database"
 	"go-slack/testutils/testserver"
 	"os"
@@ -12,7 +12,7 @@ import (
 
 type TestRunner struct {
 	ctx context.Context
-	db  *pgx.Conn
+	db  *pgxpool.Pool
 	ts  *testserver.TestServer
 }
 
@@ -27,7 +27,7 @@ func New() (*TestRunner, error) {
 	ts, err := createTestServer(ctx, db)
 
 	if err != nil {
-		db.Close(ctx)
+		db.Close()
 		return nil, err
 	}
 
@@ -38,8 +38,8 @@ func New() (*TestRunner, error) {
 	}, nil
 }
 
-func connectToDb(ctx context.Context) (*pgx.Conn, error) {
-	db, err := database.Connect(ctx)
+func connectToDb(ctx context.Context) (*pgxpool.Pool, error) {
+	db, err := database.NewDBPool(ctx, os.Getenv("DB_URL"))
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to connect to the database: %s", err)
@@ -48,11 +48,11 @@ func connectToDb(ctx context.Context) (*pgx.Conn, error) {
 	return db, nil
 }
 
-func createTestServer(ctx context.Context, db *pgx.Conn) (*testserver.TestServer, error) {
+func createTestServer(ctx context.Context, db *pgxpool.Pool) (*testserver.TestServer, error) {
 	ts, err := testserver.New(ctx, db)
 
 	if err != nil {
-		db.Close(ctx)
+		db.Close()
 		return nil, fmt.Errorf("Failed to create test server: %s", err)
 	}
 
@@ -80,13 +80,13 @@ func (tr TestRunner) Context() context.Context {
 	return tr.ctx
 }
 
-func (tr TestRunner) DB() *pgx.Conn {
+func (tr TestRunner) DB() *pgxpool.Pool {
 	return tr.db
 }
 
 func (ts TestRunner) cleanUp() {
 	ts.ClearDbData()
-	ts.db.Close(ts.ctx)
+	ts.db.Close()
 }
 
 func (ts TestRunner) ClearDbData() error {

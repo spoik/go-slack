@@ -11,26 +11,18 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	cfg, err := config.New()
-	if err != nil {
-		slog.Error("Failed to load config", "error", err)
-		os.Exit(1)
-	}
-
+	cfg := initConfig()
 	ctx := context.Background()
-	db, err := database.NewDBPool(ctx, cfg.DB_URL)
 
-	if err != nil {
-		slog.Error("Failed to connect to the database", "error", err)
-		os.Exit(1)
-	}
-
+	db := initDb(ctx, cfg)
 	defer db.Close()
 
 	server := httpserver.NewServer(ctx, db, cfg.Port)
@@ -56,4 +48,24 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("Server exited properly")
+}
+
+func initConfig() *config.Config {
+	cfg, err := config.New()
+	if err != nil {
+		slog.Error("Failed to load config", "error", err)
+		os.Exit(1)
+	}
+	return cfg
+}
+
+func initDb(ctx context.Context, cfg *config.Config) *pgxpool.Pool {
+	db, err := database.NewDBPool(ctx, cfg.DB_URL)
+
+	if err != nil {
+		slog.Error("Failed to connect to the database", "error", err)
+		os.Exit(1)
+	}
+
+	return db
 }

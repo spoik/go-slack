@@ -3,20 +3,24 @@ package httpserver
 import (
 	"context"
 	"fmt"
+	"go-slack/channels"
 	"net/http"
 
-	"go-slack/channels"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/cors"
 )
 
 func NewServer(ctx context.Context, db *pgxpool.Pool, port int) *http.Server {
 	mux := NewMux(ctx, db)
 	servePort := fmt.Sprintf(":%d", port)
 
+	// cors.Default is inappropriate for production. This should be changed if this code makes
+	// it to a production environment.
+	handler := cors.Default().Handler(mux)
+
 	return &http.Server{
 		Addr:    servePort,
-		Handler: mux,
+		Handler: handler,
 	}
 }
 

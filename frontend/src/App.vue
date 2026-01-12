@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { onMounted, ref, computed } from "vue"
-    import { getChannels } from "./utils/channel-service"
+    import { getChannels, type Channel } from "./utils/channel-service"
 
     const channels = ref<Channel[] | null>(null)
     const error = ref<string | null>(null)

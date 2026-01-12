@@ -16,8 +16,11 @@ test-up:
 	$(DOCKER_TEST) up --build -d
 test-down:
 	$(DOCKER_TEST) down
-test:
+test-app:
 	$(DOCKER_TEST) exec -T app-test go test ./...
+test-frontend:
+	$(DOCKER_TEST) exec -T frontend-test npm run test
+test-all: test-app test-frontend
 db-shell:
 	@export $$(cat .env.dev | xargs) && $(DOCKER_DEV) exec -it db psql -U $$DB_USER -d $$DB_NAME
 # Run database migrations

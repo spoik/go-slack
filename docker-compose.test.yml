@@ -21,5 +21,13 @@ services:
       db:
         condition: service_healthy
 
+  frontend-test:
+    build:
+      context: ./frontend
+      target: test
+    volumes:
+      - ./frontend/:/app
+      - /app/node_modules
+
 volumes:
   postgres_test_data:

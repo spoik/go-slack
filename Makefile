@@ -43,6 +43,6 @@ test-frontend:
 	$(DOCKER_TEST) exec -T frontend-test npm run test
 test-all: test-app test-frontend
 db-up-test: ## Run database migrations in the testing environment
-	$(DOCKER_TEST) exec --rm app-test sh -c "migrate -path migrations -database \$$DB_URL up"
+	$(DOCKER_TEST) exec app-test sh -c "migrate -path migrations -database \$$DB_URL up"
 db-drop-test: ## Drop database tables in the testing environment
 	$(DOCKER_TEST) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL drop"

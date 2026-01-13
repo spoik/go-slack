@@ -35,6 +35,25 @@ func (q *Queries) CreateChannel(ctx context.Context, name string) (Channel, erro
 	return i, err
 }
 
+const createMessage = `-- name: CreateMessage :one
+INSERT INTO messages
+(channel_id, message)
+VALUES ($1, $2)
+RETURNING id, channel_id, message
+`
+
+type CreateMessageParams struct {
+	ChannelID int64  `json:"channel_id"`
+	Message   string `json:"message"`
+}
+
+func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (Message, error) {
+	row := q.db.QueryRow(ctx, createMessage, arg.ChannelID, arg.Message)
+	var i Message
+	err := row.Scan(&i.ID, &i.ChannelID, &i.Message)
+	return i, err
+}
+
 const listChannels = `-- name: ListChannels :many
 SELECT id, name
 FROM channels
@@ -51,6 +70,32 @@ func (q *Queries) ListChannels(ctx context.Context) ([]Channel, error) {
 	for rows.Next() {
 		var i Channel
 		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const messagesInChannel = `-- name: MessagesInChannel :many
+SELECT id, channel_id, message
+FROM messages
+WHERE channel_id = $1
+`
+
+func (q *Queries) MessagesInChannel(ctx context.Context, channelID int64) ([]Message, error) {
+	rows, err := q.db.Query(ctx, messagesInChannel, channelID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Message
+	for rows.Next() {
+		var i Message
+		if err := rows.Scan(&i.ID, &i.ChannelID, &i.Message); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

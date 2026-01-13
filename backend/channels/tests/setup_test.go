@@ -29,3 +29,16 @@ func createChannel(t *testing.T, name string) *queries.Channel {
 
 	return &channel
 }
+
+func createMessage(t *testing.T, channelId int64, message string) *queries.Message {
+	p := queries.CreateMessageParams{ChannelID: channelId, Message: message}
+	m, err := q.CreateMessage(tr.Context(), p)
+
+	if err != nil {
+		t.Fatal(err)
+		return nil
+	}
+
+	return &m
+}
+

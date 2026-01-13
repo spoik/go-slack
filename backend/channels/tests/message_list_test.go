@@ -2,10 +2,11 @@ package tests
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"go-slack/channels/queries"
+	"go-slack/testutils"
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMessageListUnkownChannel(t *testing.T) {
@@ -24,11 +25,43 @@ func TestMessageListInvalidChannelId(t *testing.T) {
 	})
 }
 
-func TestMessageListKnownChannel(t *testing.T) {
+func TestMessageListKnownChannelWithMessages(t *testing.T) {
 	tr.Test(func() {
 		channel := createChannel(t, "Main")
+		message1 := createMessage(t, channel.ID, "Message")
+		message2 := createMessage(t, channel.ID, "Message 2")
+
+		otherChannel := createChannel(t, "Secondary")
+		createMessage(t, otherChannel.ID, "Other Message")
+
 		route := fmt.Sprintf("/channels/%d/messages", channel.ID)
 		respRec := ts.MakeRequest(t, "GET", route)
+
+		var messages []queries.Message
+		testutils.DecodeJsonResponse(t, respRec, &messages)
+
 		assert.Equal(t, http.StatusOK, respRec.Code)
+
+		assert.Equal(t, message1.ID, messages[0].ID)
+		assert.Equal(t, message1.Message, messages[0].Message)
+
+		assert.Equal(t, message2.ID, messages[1].ID)
+		assert.Equal(t, message2.Message, messages[1].Message)
+	})
+}
+
+func TestMessageListKnownChannelWithoutMessages(t *testing.T) {
+	tr.Test(func() {
+		channel := createChannel(t, "Main")
+
+		route := fmt.Sprintf("/channels/%d/messages", channel.ID)
+		respRec := ts.MakeRequest(t, "GET", route)
+
+		var messages []queries.Message
+		testutils.DecodeJsonResponse(t, respRec, &messages)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+
+		assert.Equal(t, "[]\n", respRec.Body.String())
 	})
 }

@@ -12,3 +12,14 @@ RETURNING *;
 SELECT EXISTS (
 	SELECT 1 FROM channels WHERE id=$1
 );
+
+-- name: CreateMessage :one
+INSERT INTO messages
+(channel_id, message)
+VALUES ($1, $2)
+RETURNING *;
+
+-- name: MessagesInChannel :many
+SELECT *
+FROM messages
+WHERE channel_id = $1;

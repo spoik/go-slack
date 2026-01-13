@@ -1,11 +1,10 @@
 package handlers
 
 import (
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go-slack/channels/queries"
 	"net/http"
 	"strconv"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type MessageList struct {
@@ -18,16 +17,16 @@ func NewMessageList(db *pgxpool.Pool) *MessageList {
 
 }
 
-func (ml MessageList) ServeHTTP(w http.ResponseWriter, r *http.Request)	{
-	id := r.PathValue("id")
+func (ml MessageList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
 
-	idStr, err := strconv.ParseInt(id, 10, 64)
+	channelId, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid channel id", http.StatusUnprocessableEntity)	
+		http.Error(w, "Invalid channel id", http.StatusUnprocessableEntity)
 		return
 	}
 
-	exists, err := ml.queries.ChannelExists(r.Context(), idStr)
+	exists, err := ml.queries.ChannelExists(r.Context(), channelId)
 
 	if err != nil {
 		internalServerError(w)
@@ -35,7 +34,20 @@ func (ml MessageList) ServeHTTP(w http.ResponseWriter, r *http.Request)	{
 	}
 
 	if !exists {
-		http.Error(w, "Channel does not exist", http.StatusNotFound)	
+		http.Error(w, "Channel does not exist", http.StatusNotFound)
 		return
 	}
+
+	messages, err := ml.queries.MessagesInChannel(r.Context(), channelId)
+
+	if err != nil {
+		internalServerError(w)
+		return
+	}
+
+	if messages == nil {
+		messages = []queries.Message{}
+	}
+
+	writeJsonResponse(w, messages)
 }

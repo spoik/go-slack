@@ -1,6 +1,6 @@
 CREATE TABLE messages (
 	id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	channel_id BIGINT,
+	channel_id BIGINT NOT NULL,
 	message TEXT NOT NULL,
 	CONSTRAINT fk_channel
 		FOREIGN KEY(channel_id)

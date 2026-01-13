@@ -45,4 +45,6 @@ test-all: test-app test-frontend
 db-up-test: ## Run database migrations in the testing environment
 	$(DOCKER_TEST) exec app-test sh -c "migrate -path migrations -database \$$DB_URL up"
 db-drop-test: ## Drop database tables in the testing environment
-	$(DOCKER_TEST) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL drop"
+	$(DOCKER_TEST) exec app-test sh -c "migrate -path migrations -database \$$DB_URL drop"
+db-shell-test:
+	@export $$(cat .env.test | xargs) && $(DOCKER_TEST) exec -it db psql -U $$DB_USER -d $$DB_NAME

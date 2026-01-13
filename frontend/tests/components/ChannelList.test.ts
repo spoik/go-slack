@@ -4,11 +4,11 @@ import { nextTick } from 'vue'
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { getChannels, type Channel } from '@/utils/channel-service'
-import Channels from '@/components/Channels.vue'
+import ChannelList from '@/components/ChannelList.vue'
 
 vi.mock('@/utils/channel-service')
 
-describe('Channel component', () => {
+describe('ChannelList component', () => {
 	function mockGetChannels(channels: Channel[]) {
 		vi.mocked(getChannels).mockResolvedValue(channels)
 	}
@@ -16,7 +16,7 @@ describe('Channel component', () => {
 	it('shows a loading message while the channels are loading', async () => {
 		mockGetChannels([{id: 1, name: "test"}])
 
-		const wrapper = mount(Channels)
+		const wrapper = mount(ChannelList)
 
 		expect(wrapper.find('[data-test="loading"]').exists()).toBe(true)
 
@@ -34,7 +34,7 @@ describe('Channel component', () => {
 			{ id: '3', name: 'other' },
 		])
 
-		const wrapper = mount(Channels)
+		const wrapper = mount(ChannelList)
 		await nextTick()
 		await nextTick()
 
@@ -44,7 +44,7 @@ describe('Channel component', () => {
 	it('shows an error if the channels failed to load', async () => {
 		vi.mocked(getChannels).mockRejectedValue()
 
-		const wrapper = mount(Channels)
+		const wrapper = mount(ChannelList)
 		expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
 
 		await nextTick()

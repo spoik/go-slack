@@ -4,8 +4,8 @@
 </script>
 
 <template>
-    <div id="container" class="min-h-screen flex gap-10 p-8">
-        <ChannelList id="channel-list" class="p-8"/>
-        <CurrentChannel id="current-channel" class="p-8 grow"/>
+    <div id="container" class="min-h-screen flex gap-10 p-5 lg:p-8">
+        <ChannelList id="channel-list" class="p-5 lg:p-8"/>
+        <CurrentChannel id="current-channel" class="p-5 lg:p-8 grow"/>
     </div>
 </template>

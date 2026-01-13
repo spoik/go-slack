@@ -22,12 +22,14 @@
 </script>
 
 <template>
-    <h1>Channels</h1>
+    <div>
+        <h1>Channels</h1>
 
-    <p v-if="loading" data-test="loading">Loading...</p>
-    <p v-if="error != null" data-test="error">{{ error }}</p>
+        <p v-if="loading" data-test="loading">Loading...</p>
+        <p v-if="error != null" data-test="error">{{ error }}</p>
 
-    <ul v-if="channels?.length">
-        <li v-for="channel in channels" :key="channel.id">{{channel.name}}</li>
-    </ul>
+        <ul v-if="channels?.length">
+            <li v-for="channel in channels" :key="channel.id">{{channel.name}}</li>
+        </ul>
+    </div>
 </template>

@@ -3,7 +3,7 @@ package httpserver
 import (
 	"context"
 	"fmt"
-	"go-slack/channels"
+	"go-slack/channels/handlers"
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -26,6 +26,7 @@ func NewServer(ctx context.Context, db *pgxpool.Pool, port int) *http.Server {
 
 func NewMux(ctx context.Context, db *pgxpool.Pool) *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.Handle("GET /channels", channels.NewChannelList(ctx, db))
+	mux.Handle("GET /channels", handlers.NewChannelList(db))
+	mux.Handle("GET /channels/{id}/messages", handlers.NewMessageList(db))
 	return mux
 }

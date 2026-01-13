@@ -9,6 +9,19 @@ import (
 	"context"
 )
 
+const channelExists = `-- name: ChannelExists :one
+SELECT EXISTS (
+	SELECT 1 FROM channels WHERE id=$1
+)
+`
+
+func (q *Queries) ChannelExists(ctx context.Context, id int64) (bool, error) {
+	row := q.db.QueryRow(ctx, channelExists, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createChannel = `-- name: CreateChannel :one
 INSERT INTO channels (name)
 VALUES ($1)

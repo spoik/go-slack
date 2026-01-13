@@ -4,7 +4,17 @@
 
 package queries
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
 type Channel struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
+}
+
+type Message struct {
+	ID        int64       `json:"id"`
+	ChannelID pgtype.Int8 `json:"channel_id"`
+	Message   string      `json:"message"`
 }

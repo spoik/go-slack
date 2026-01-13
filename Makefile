@@ -24,7 +24,7 @@ db-shell:
 db-up-dev: # Run database migrations
 	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL up"
 db-down-dev: ## Rollback one database migration in the development environment
-	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL down"
+	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL down 1"
 db-drop-dev: ## Drop database tables in development environment
 	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL drop"
 db-migration: ## Create a new database migration in the development environment

@@ -1,7 +1,6 @@
-package channels
+package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"go-slack/channels/queries"
 	"log/slog"
@@ -28,7 +27,7 @@ type ChannelList struct {
 	queries *queries.Queries
 }
 
-func NewChannelList(ctx context.Context, db *pgxpool.Pool) *ChannelList {
+func NewChannelList(db *pgxpool.Pool) *ChannelList {
 	q := queries.New(db)
 	return &ChannelList{queries: q}
 }

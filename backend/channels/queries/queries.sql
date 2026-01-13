@@ -7,3 +7,8 @@ ORDER BY name ASC;
 INSERT INTO channels (name)
 VALUES ($1)
 RETURNING *;
+
+-- name: ChannelExists :one
+SELECT EXISTS (
+	SELECT 1 FROM channels WHERE id=$1
+);

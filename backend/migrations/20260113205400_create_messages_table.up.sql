@@ -1,0 +1,8 @@
+CREATE TABLE messages (
+	id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	channel_id BIGINT,
+	message TEXT NOT NULL,
+	CONSTRAINT fk_channel
+		FOREIGN KEY(channel_id)
+		REFERENCES channels(id)
+);

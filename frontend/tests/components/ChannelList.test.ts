@@ -52,4 +52,23 @@ describe('ChannelList component', () => {
 
 		expect(wrapper.find('[data-test="error"]').exists()).toBe(true)
 	})
+
+	it('emits channelSelected event with channel the when a channel is clicked', async () => {
+		const testChannels = [
+			{ id: '1', name: 'general' },
+			{ id: '2', name: 'temp' },
+		]
+		mockGetChannels(testChannels)
+
+		const wrapper = mount(ChannelList)
+		await nextTick()
+		await nextTick()
+
+		await wrapper.findAll('[data-test="channel"]')[0].trigger('click')
+
+		expect(wrapper.emitted('channelSelected')).toBeTruthy()
+
+		const emittedChannel = wrapper.emitted('channelSelected')[0][0]
+		expect(emittedChannel).toEqual(testChannels[0])
+	})
 })

@@ -33,7 +33,7 @@ sqlc-generate: ## Generate sqlc files
 	$(DOCKER_DEV) exec app-dev go tool sqlc generate
 
 # --- Testing environment ---
-test-up:
+test:
 	$(DOCKER_TEST) up --build -d
 test-down:
 	$(DOCKER_TEST) down

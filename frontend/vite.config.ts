@@ -18,12 +18,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  test: {
-    // Automatically clear mock calls/stats before every test
-    clearMocks: true,
-    // Automatically reset mock implementation before every test
-    mockReset: true,
-    // Automatically restore spyOn mocks to original implementations
-    restoreMocks: true,
-  },
 })

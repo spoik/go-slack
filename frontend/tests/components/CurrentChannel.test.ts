@@ -32,7 +32,6 @@ describe('CurrentChannel component', () => {
         it('shows a message when no channel is selected', () => {
             expect(wrapper.get('[data-test="channel empty message"]').text()).toContain('Please select a channel.')
 
-            expect(wrapper.find('[data-test="channel name"]').exists()).toBe(false)
             expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
             expect(wrapper.find('[data-test="messages empty message"]').exists()).toBe(false)
         })
@@ -59,7 +58,6 @@ describe('CurrentChannel component', () => {
 
         it('shows the channel name when a channel is selected', async () => {
             const wrapper = await initWrapper()
-            expect(wrapper.get('[data-test="channel name"]').text()).toBe(channel.name)
             expect(wrapper.find('[data-test="channel empty message"]').exists()).toBe(false)
             expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
         })
@@ -141,14 +139,6 @@ describe('CurrentChannel component', () => {
             await wrapper.setProps({ channel: channel2 })
             await nextTick()
         }
-
-        it('updates the name of the channel', async () => {
-            const wrapper = await initWrapper()
-            expect(wrapper.get('[data-test="channel name"]').text()).toEqual(channel1.name)
-
-            await changeChannel(wrapper)
-            expect(wrapper.get('[data-test="channel name"]').text()).toEqual(channel2.name)
-        })
 
         it('loads messages from the new channel', async () => {
             const wrapper = await initWrapper()

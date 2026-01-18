@@ -33,9 +33,6 @@ onMounted(loadMessages)
         <p v-if="channel == null" data-test="channel empty message">Please select a channel.</p>
 
         <template v-else>
-            <h2 class="mb-1" data-test="channel name">{{ channel.name }}</h2>
-            <hr class="mb-3">
-
             <p v-if="error != undefined" data-test="error">{{ error }}</p>
             <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
             <ul v-else data-test="messages">

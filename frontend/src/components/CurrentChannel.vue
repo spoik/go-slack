@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { toRefs, ref, onMounted, computed } from "vue"
+import { toRefs, ref, onMounted, computed, watch } from "vue"
 import { type Channel, type Message, getMessages } from "@/utils/channel-service"
 
 const props = defineProps<{ channel?: Channel }>()
 const { channel } = toRefs(props)
 const messages = ref<Message[] | undefined>(undefined)
 const error = ref<string | undefined>(undefined)
-
-const hasMessages = computed((): boolean => {
-    return messages.value != undefined && messages.value.length > 0
-})
 
 async function loadMessages() {
     if (channel.value == null) {
@@ -22,13 +18,21 @@ async function loadMessages() {
         error.value = "An error occurred when loading the channel. Please try again."
     }
 }
+
+const hasMessages = computed((): boolean => {
+    return messages.value != undefined && messages.value.length > 0
+})
+
+watch(channel, loadMessages)
+
+
 onMounted(loadMessages)
 </script>
 
 <template>
     <div>
         <p v-if="channel == null" data-test="channel empty message">Please select a channel.</p>
-        <div v-if="channel != null">
+        <div v-else>
             <h1>{{ channel.name }}</h1>
         </div>
 

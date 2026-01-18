@@ -15,6 +15,10 @@ describe('CurrentChannel component', () => {
         getMessagesMocked = vi.mocked(getMessages)
     })
 
+    function mockGetMessages(messages: Message[]) {
+        getMessagesMocked.mockResolvedValue(messages)
+    }
+
     describe('when a channel is not provided', () => {
         let wrapper: VueWrapper<InstanceType<typeof CurrentChannel>>
 
@@ -49,10 +53,6 @@ describe('CurrentChannel component', () => {
 
             return wrapper
         }
-
-	function mockGetMessages(messages: Message[]) {
-            getMessagesMocked.mockResolvedValue(messages)
-	}
 
         it('shows the channel name when a channel is selected', async () => {
             const wrapper = await initWrapper()
@@ -107,6 +107,56 @@ describe('CurrentChannel component', () => {
                 expect(wrapper.get('[data-test-message="1"]').text()).toEqual(messages[0].message)
                 expect(wrapper.get('[data-test-message="2"]').text()).toEqual(messages[1].message)
             })
+        })
+    })
+
+    describe('when the channel is changed', () => {
+        const channel1: Channel = { id: '1', name: 'general' }
+        const channel1Messages: Message[] = [{ id: '1', message: 'message 1'}]
+
+        const channel2: Channel = { id: '2', name: 'test' }
+        const channel2Messages: Message[] = [
+            { id: '2', message: 'message 2'},
+            { id: '3', message: 'message 3'},
+        ]
+
+        async function initWrapper(): VueWrapper<InstanceType<typeof CurrentChannel>> {
+            mockGetMessages(channel1Messages)
+
+            const wrapper = mount(CurrentChannel, {
+                props: {
+                    channel: channel1
+                }
+            })
+
+            await nextTick()
+
+            return wrapper
+        }
+
+        async function changeChannel(wrapper: VueWrapper<InstanceType<typeof CurrentChannel>>) {
+            await wrapper.setProps({ channel: channel2 })
+            await nextTick()
+        }
+
+        it('updates the name of the channel', async () => {
+            const wrapper = await initWrapper()
+            expect(wrapper.get('h1').text()).toEqual(channel1.name)
+
+            await changeChannel(wrapper)
+            expect(wrapper.get('h1').text()).toEqual(channel2.name)
+        })
+
+        it('loads messages from the new channel', async () => {
+            const wrapper = await initWrapper()
+            expect(wrapper.findAll('[data-test-message]').length).toEqual(1)
+            expect(wrapper.get('[data-test-message="1"]').text()).toEqual(channel1Messages[0].message)
+
+            mockGetMessages(channel2Messages)
+            await changeChannel(wrapper)
+            expect(wrapper.findAll('[data-test-message]').length).toEqual(2)
+            expect(wrapper.get('[data-test-message="2"]').text()).toEqual(channel2Messages[0].message)
+            expect(wrapper.get('[data-test-message="3"]').text()).toEqual(channel2Messages[1].message)
         })
     })
 })

@@ -13,7 +13,7 @@
 
 <template>
     <div id="container" class="min-h-screen flex gap-10 p-5 lg:p-8">
-        <ChannelList id="channel-list" class="p-5 lg:p-8" @channel-selected="channelSelected"/>
-        <CurrentChannel id="current-channel" class="p-5 lg:p-8 grow" :channel="currentChannel"/>
+        <ChannelList id="channel-list" @channel-selected="channelSelected"/>
+        <CurrentChannel id="current-channel" class="grow" :channel="currentChannel"/>
     </div>
 </template>

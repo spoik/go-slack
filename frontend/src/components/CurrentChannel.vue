@@ -25,27 +25,24 @@ const hasMessages = computed((): boolean => {
 
 watch(channel, loadMessages)
 
-
 onMounted(loadMessages)
 </script>
 
 <template>
-    <div>
+    <div class="p-5 border">
         <p v-if="channel == null" data-test="channel empty message">Please select a channel.</p>
-        <div v-else>
-            <h1>{{ channel.name }}</h1>
-        </div>
 
-        <p v-if="error != undefined" data-test="error">{{ error }}</p>
-        <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
-        <ul v-else data-test="messages">
-            <li
-                v-for="message in messages"
-                :key="message.id"
-                :data-test-message="message.id"
-            >
-                {{ message.message }}
-            </li>
-        </ul>
+        <template v-else>
+            <h2 class="mb-1" data-test="channel name">{{ channel.name }}</h2>
+            <hr class="mb-3">
+
+            <p v-if="error != undefined" data-test="error">{{ error }}</p>
+            <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
+            <ul v-else data-test="messages">
+                <li v-for="message in messages" :key="message.id" :data-test-message="message.id">
+                    {{ message.message }}
+                </li>
+            </ul>
+        </template>
     </div>
 </template>

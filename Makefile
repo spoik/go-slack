@@ -12,10 +12,13 @@ MIGRATE_CONFIG=-path migrations -database $$DB_URL
 help: ## Display this help screen
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
+up: dev-up test-up
+down: dev-down test-down
+
 # --- Development environment ---
-dev: ## Start development docker environment
+dev-up: ## Start development docker environment
 	$(DOCKER_DEV) up --build
-down: ## Stop development docker environment
+dev-down: ## Stop development docker environment
 	$(DOCKER_DEV) down
 shell:
 	$(DOCKER_DEV) exec app-dev sh
@@ -33,7 +36,7 @@ sqlc-generate: ## Generate sqlc files
 	$(DOCKER_DEV) exec app-dev go tool sqlc generate
 
 # --- Testing environment ---
-test:
+test-up:
 	$(DOCKER_TEST) up --build -d
 test-down:
 	$(DOCKER_TEST) down

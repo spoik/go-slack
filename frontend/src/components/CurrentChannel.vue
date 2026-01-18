@@ -1,16 +1,47 @@
 <script setup lang="ts">
-    import { toRefs } from "vue"
-    import { type Channel } from "@/utils/channel-service"
+import { toRefs, ref, onMounted, computed } from "vue"
+import { type Channel, type Message, getMessages } from "@/utils/channel-service"
 
-    const props = defineProps<{ channel?: Channel }>()
-    const { channel } = toRefs(props)
+const props = defineProps<{ channel?: Channel }>()
+const { channel } = toRefs(props)
+const messages = ref<Message[] | undefined>(undefined)
+const error = ref<string | undefined>(undefined)
+
+const hasMessages = computed((): boolean => {
+    return messages.value != undefined && messages.value.length > 0
+})
+
+async function loadMessages() {
+    if (channel.value == null) {
+        return
+    }
+
+    try {
+        messages.value = await getMessages(channel.value.id)
+    } catch (e) {
+        error.value = "An error occurred when loading the channel. Please try again."
+    }
+}
+onMounted(loadMessages)
 </script>
 
 <template>
     <div>
-        <p v-if="channel == null" data-test="empty message">Please select a channel.</p>
+        <p v-if="channel == null" data-test="channel empty message">Please select a channel.</p>
         <div v-if="channel != null">
             <h1>{{ channel.name }}</h1>
         </div>
+
+        <p v-if="error != undefined" data-test="error">{{ error }}</p>
+        <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
+        <ul v-else data-test="messages">
+            <li
+                v-for="message in messages"
+                :key="message.id"
+                :data-test-message="message.id"
+            >
+                {{ message.message }}
+            </li>
+        </ul>
     </div>
 </template>

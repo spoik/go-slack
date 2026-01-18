@@ -17,7 +17,6 @@
             channels.value = await getChannels()
         } catch(err) {
             error.value = "Failed to load channels. Please reload to try again."
-            console.log("Failed to fetch channels:", err)
         }
     }
 

@@ -36,7 +36,7 @@ onMounted(loadMessages)
             <p v-if="error != undefined" data-test="error">{{ error }}</p>
             <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
             <ul v-else data-test="messages">
-                <li v-for="message in messages" :key="message.id" :data-test-message="message.id">
+                <li v-for="message in messages" :key="message.id" :data-test-message="message.id" class="mb-5">
                     {{ message.message }}
                 </li>
             </ul>

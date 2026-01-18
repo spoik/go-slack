@@ -71,4 +71,41 @@ describe('ChannelList component', () => {
 		const emittedChannel = wrapper.emitted('channelSelected')[0][0]
 		expect(emittedChannel).toEqual(testChannels[0])
 	})
+
+	it('shows no active channel when selectedChannel prop is empty', async () => {
+		const channels: Channel[] = [
+			{ id: '1', name: 'general' },
+			{ id: '2', name: 'temp' },
+		]
+		mockGetChannels(channels)
+
+		const wrapper = mount(ChannelList, {
+			props: {
+				selectedChannel: undefined
+			}
+		})
+		await nextTick()
+		await nextTick()
+		
+		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(0)
+	})
+
+	it('shows an active channel when selectedChannel prop is provided', async () => {
+		const channels: Channel[] = [
+			{ id: '1', name: 'general' },
+			{ id: '2', name: 'temp' },
+		]
+		mockGetChannels(channels)
+
+		const wrapper = mount(ChannelList, {
+			props: {
+				selectedChannel: channels[0]
+			}
+		})
+		await nextTick()
+		await nextTick()
+		
+		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(1)
+		expect(wrapper.get('[data-test="channel"].active').text()).toEqual(channels[0].name)
+	})
 })

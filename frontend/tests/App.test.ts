@@ -14,7 +14,7 @@ describe('App component', () => {
 	vi.mocked(getChannels).mockResolvedValue(channels)
     }
 
-    it('forwards the selected channel from ChannelList to CurrentChannel', async () => {
+    it('forwards the selected channel from ChannelList to CurrentChannel and back to ChannelList', async () => {
         const testChannels = [
             { id: '1', name: 'general' },
             { id: '2', name: 'temp' },
@@ -22,13 +22,15 @@ describe('App component', () => {
         mockGetChannels(testChannels)
 
         const wrapper = shallowMount(App)
-
-        // Simulate ChannelList emitting a channelSelected event
+        const currentChannl = wrapper.findComponent(CurrentChannel)
         const channelList = wrapper.findComponent(ChannelList)
+
+        expect(currentChannl.props('channel')).toEqual(undefined)
+        expect(channelList.props('selectedChannel')).toEqual(undefined)
+
         await channelList.vm.$emit('channelSelected', testChannels[1])
         
-        // Assert that CurrentChannel is passed the channel emitted in the channelSelected event
-        const currentChannl = wrapper.findComponent(CurrentChannel)
         expect(currentChannl.props('channel')).toEqual(testChannels[1])
+        expect(channelList.props('selectedChannel')).toEqual(testChannels[1])
     })
 })

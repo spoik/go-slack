@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue"
+import { onMounted, ref, computed, toRefs } from "vue"
 import { getChannels, type Channel } from "@/utils/channel-service"
 
 const emit = defineEmits<{
     channelSelected: [channel: Channel]
 }>()
+
+const props = defineProps<{ selectedChannel?: Channel }>()
+const { selectedChannel } = toRefs(props)
 
 const channels = ref<Channel[] | null>(null)
 const error = ref<string | null>(null)
@@ -33,15 +36,23 @@ onMounted(loadChannels)
 
         <ul v-if="channels?.length">
             <li v-for="channel in channels" :key="channel.id">
-                <a
-                    href="#"
-                    class="p-2 mb-3 block bg-gray-300"
-                    @click="$emit('channelSelected', channel)"
-                    data-test="channel" 
-                >
+                <a href="#" @click="$emit('channelSelected', channel)" data-test="channel" class="channel-title"
+                    :class="{ 'active': channel.id == selectedChannel?.id }">
                     {{ channel.name }}
                 </a>
             </li>
         </ul>
     </div>
 </template>
+
+<style scoped>
+@reference "tailwindcss";
+
+.channel-title {
+    @apply p-2 mb-3 block;
+}
+
+.channel-title.active {
+    @apply bg-gray-300;
+}
+</style>

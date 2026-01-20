@@ -39,7 +39,7 @@ const createMessage = `-- name: CreateMessage :one
 INSERT INTO messages
 (channel_id, message)
 VALUES ($1, $2)
-RETURNING id, channel_id, message
+RETURNING id, channel_id, message, created_at
 `
 
 type CreateMessageParams struct {
@@ -50,7 +50,12 @@ type CreateMessageParams struct {
 func (q *Queries) CreateMessage(ctx context.Context, arg CreateMessageParams) (Message, error) {
 	row := q.db.QueryRow(ctx, createMessage, arg.ChannelID, arg.Message)
 	var i Message
-	err := row.Scan(&i.ID, &i.ChannelID, &i.Message)
+	err := row.Scan(
+		&i.ID,
+		&i.ChannelID,
+		&i.Message,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -81,7 +86,7 @@ func (q *Queries) ListChannels(ctx context.Context) ([]Channel, error) {
 }
 
 const messagesInChannel = `-- name: MessagesInChannel :many
-SELECT id, channel_id, message
+SELECT id, channel_id, message, created_at
 FROM messages
 WHERE channel_id = $1
 `
@@ -95,7 +100,12 @@ func (q *Queries) MessagesInChannel(ctx context.Context, channelID int64) ([]Mes
 	var items []Message
 	for rows.Next() {
 		var i Message
-		if err := rows.Scan(&i.ID, &i.ChannelID, &i.Message); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.ChannelID,
+			&i.Message,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

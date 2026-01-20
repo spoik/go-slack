@@ -49,7 +49,11 @@ onMounted(loadChannels)
 @reference "tailwindcss";
 
 .channel-title {
-    @apply p-2 mb-3 block;
+    @apply p-2 block;
+}
+
+.channel-title:hover {
+    @apply bg-gray-100;
 }
 
 .channel-title.active {

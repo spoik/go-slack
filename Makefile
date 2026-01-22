@@ -17,7 +17,7 @@ down: dev-down test-down
 
 # --- Development environment ---
 dev-up: ## Start development docker environment
-	$(DOCKER_DEV) up --build
+	$(DOCKER_DEV) up --build -d
 dev-down: ## Stop development docker environment
 	$(DOCKER_DEV) down
 shell:

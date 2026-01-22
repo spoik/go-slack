@@ -1,8 +1,8 @@
 <script setup lang="ts">
     import { ref } from "vue"
-    import ChannelList from "./components/ChannelList.vue"
-    import CurrentChannel from "./components/CurrentChannel.vue"
-    import { type Channel } from "./utils/channel-service.ts"
+    import ChannelList from "@/components/ChannelList.vue"
+    import CurrentChannel from "@/components/CurrentChannel.vue"
+    import { type Channel } from "@/utils/channel-service.ts"
 
     const currentChannel = ref<Channel | undefined>()
 

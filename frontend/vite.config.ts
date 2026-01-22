@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vitest/config'
@@ -19,6 +20,7 @@ export default defineConfig({
     },
   },
   test: {
+    globals: true,
     clearMocks: true,
     mockReset: false,
     restoreMocks: true,

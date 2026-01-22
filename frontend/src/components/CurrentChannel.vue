@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toRefs, ref, onMounted, computed, watch } from "vue"
-import { type Channel, type Message, getMessages } from "@/utils/channel-service"
+import { type Channel, Message, getMessages } from "@/utils/channel-service"
 
 const props = defineProps<{ channel?: Channel }>()
 const { channel } = toRefs(props)
@@ -19,7 +19,7 @@ async function loadMessages() {
     }
 }
 
-const hasMessages = computed((): boolean => {
+const hasMessages = computed(() => {
     return messages.value != undefined && messages.value.length > 0
 })
 
@@ -34,10 +34,16 @@ onMounted(loadMessages)
 
         <template v-else>
             <p v-if="error != undefined" data-test="error">{{ error }}</p>
+
             <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
+
             <ul v-else data-test="messages">
-                <li v-for="message in messages" :key="message.id" :data-test-message="message.id" class="mb-5">
-                    {{ message.message }}
+                <li v-for="message in messages" :key="message.id" :data-test-message="message.id" class="mb-5 flex">
+                    <p class="grow" data-test="message text">{{ message.message }}</p>
+
+                    <time data-test="datetime" class="text-gray-400" :datetime="message.created_at.toISOString()"> 
+                        {{ message.formattedDate() }}
+                    </time>
                 </li>
             </ul>
         </template>

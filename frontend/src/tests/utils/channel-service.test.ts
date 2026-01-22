@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { vi, describe, it, expect } from 'vitest'
 import axios from 'axios'
-import { getChannels, getMessages, type Channel, type Message } from '../../src/utils/channel-service'
+import { getChannels, getMessages, type Channel, Message } from '@/utils/channel-service'
 
 // Mock axios
 vi.mock('axios')
@@ -12,7 +12,7 @@ describe('channel-service', () => {
         { id: '1', name: 'general' },
         { id: '2', name: 'random' },
       ]
-      axios.get.mockResolvedValue({ data: mockChannels })
+      vi.mocked(axios.get).mockResolvedValue({ data: mockChannels })
 
       const channels = await getChannels()
 
@@ -25,11 +25,11 @@ describe('channel-service', () => {
     it('should call axios.get with the correct URL', async () => {
       const channelId = "4"
       const mockMessages: Message[] = [
-        { id: '1', message: 'message 1' },
-        { id: '2', message: 'message 2' },
+        new Message('1', 'message 1', new Date()),
+        new Message('2', 'message 2', new Date())
       ]
       
-      axios.get.mockResolvedValue({ data: mockMessages})
+      vi.mocked(axios.get).mockResolvedValue({ data: mockMessages})
 
       const messages = await getMessages(channelId)
 

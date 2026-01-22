@@ -14,7 +14,7 @@ describe('ChannelList component', () => {
 	}
 
 	it('shows a loading message while the channels are loading', async () => {
-		mockGetChannels([{id: 1, name: "test"}])
+		mockGetChannels([{id: "1", name: "test"}])
 
 		const wrapper = mount(ChannelList)
 
@@ -42,7 +42,7 @@ describe('ChannelList component', () => {
 	})
 
 	it('shows an error if the channels failed to load', async () => {
-		vi.mocked(getChannels).mockRejectedValue()
+		vi.mocked(getChannels).mockRejectedValue(new Error("error"))
 
 		const wrapper = mount(ChannelList)
 		expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
@@ -51,6 +51,7 @@ describe('ChannelList component', () => {
 		await nextTick()
 
 		expect(wrapper.find('[data-test="error"]').exists()).toBe(true)
+		expect(wrapper.find('[data-test="error"]').text()).toEqual('Failed to load channels. Please reload to try again.')
 	})
 
 	it('emits channelSelected event with channel the when a channel is clicked', async () => {
@@ -64,11 +65,11 @@ describe('ChannelList component', () => {
 		await nextTick()
 		await nextTick()
 
-		await wrapper.findAll('[data-test="channel"]')[0].trigger('click')
+		wrapper.findAll('[data-test="channel"]')[0]?.trigger('click')
 
 		expect(wrapper.emitted('channelSelected')).toBeTruthy()
 
-		const emittedChannel = wrapper.emitted('channelSelected')[0][0]
+		const emittedChannel = wrapper.emitted('channelSelected')?.[0]?.[0]
 		expect(emittedChannel).toEqual(testChannels[0])
 	})
 
@@ -106,6 +107,6 @@ describe('ChannelList component', () => {
 		await nextTick()
 		
 		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(1)
-		expect(wrapper.get('[data-test="channel"].active').text()).toEqual(channels[0].name)
+		expect(wrapper.get('[data-test="channel"].active').text()).toEqual(channels[0]?.name)
 	})
 })

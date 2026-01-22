@@ -40,13 +40,13 @@ test-up:
 	$(DOCKER_TEST) up --build -d
 test-down:
 	$(DOCKER_TEST) down
-test-app:
-	$(DOCKER_TEST) exec -T app-test go test ./...
+test-app: db-up-test
+	$(DOCKER_TEST) exec -T app-test go test -count=1 ./...
 test-frontend:
 	$(DOCKER_TEST) exec -T frontend-test npm run test
 test-all: test-app test-frontend
 db-up-test: ## Run database migrations in the testing environment
-	$(DOCKER_TEST) exec app-test sh -c "migrate -path migrations -database \$$DB_URL up"
+	$(DOCKER_TEST) exec -T app-test sh -c "migrate -path migrations -database \$$DB_URL up"
 db-drop-test: ## Drop database tables in the testing environment
 	$(DOCKER_TEST) exec app-test sh -c "migrate -path migrations -database \$$DB_URL drop"
 db-shell-test:

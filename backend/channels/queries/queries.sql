@@ -19,6 +19,9 @@ INSERT INTO messages
 VALUES ($1, $2)
 RETURNING *;
 
+-- name: CountMessages :one
+SELECT COUNT(*) FROM messages;
+
 -- name: MessagesInChannel :many
 SELECT *
 FROM messages

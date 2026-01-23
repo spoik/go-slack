@@ -14,7 +14,6 @@ type MessageList struct {
 func NewMessageList(db *pgxpool.Pool) *MessageList {
 	q := queries.New(db)
 	return &MessageList{queries: q}
-
 }
 
 func (ml MessageList) ServeHTTP(w http.ResponseWriter, r *http.Request) {

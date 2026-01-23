@@ -1,12 +1,15 @@
 package testserver
 
 import (
+	"bytes"
 	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"encoding/json"
 	"go-slack/httpserver"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type TestServer struct {
@@ -26,12 +29,36 @@ func (ts TestServer) MakeRequest(t *testing.T, method string, url string) *httpt
 	return respRec
 }
 
+func (ts TestServer) MakeJsonRequest(t *testing.T, method string, url string, data any) *httptest.ResponseRecorder {
+	respRec := httptest.NewRecorder()
+	req := createJsonRequest(t, method, url, data)
+	ts.mux.ServeHTTP(respRec, req)
+	return respRec
+}
+
 func createRequest(t *testing.T, method string, url string) *http.Request {
 	req, err := http.NewRequest(method, url, nil)
 
 	if err != nil {
 		t.Fatal("Creating", method, url, "request failed.")
 	}
+
+	return req
+}
+
+func createJsonRequest(t *testing.T, method string, url string, data any) *http.Request {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		t.Fatal("Unable to marshal data to JSON for", method, "to", url)
+	}
+
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		t.Fatal("Creating", method, url, "request failed.")
+	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	return req
 }

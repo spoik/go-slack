@@ -28,5 +28,6 @@ func NewMux(ctx context.Context, db *pgxpool.Pool) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.Handle("GET /channels", handlers.NewChannelList(db))
 	mux.Handle("GET /channels/{id}/messages", handlers.NewMessageList(db))
+	mux.Handle("POST /channels/{id}/messages", handlers.NewCreateMessage(db))
 	return mux
 }

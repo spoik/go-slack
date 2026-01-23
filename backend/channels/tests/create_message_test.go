@@ -36,6 +36,24 @@ func TestCreateMessageWithUnknownChannelId(t *testing.T) {
 	})
 }
 
+func TestCreateMessageWithInValidJSON(t *testing.T) {
+	type invalidRequest struct{ name string }
+
+	tr.Test(func() {
+		assertNumMessages(t, 0)
+		channel := createChannel(t, "Channel")
+
+		data := invalidRequest{name: "test"}
+
+		url := fmt.Sprintf("/channels/%d/messages", channel.ID)
+		r := ts.MakeJsonRequest(t, "POST", url, data)
+
+		assert.Equal(t, http.StatusBadRequest, r.Code)
+
+		assertNumMessages(t, 0)
+	})
+}
+
 func TestSuccessfulCreateMessage(t *testing.T) {
 	tr.Test(func() {
 		// Count the number of messages currently in the database.
@@ -46,7 +64,7 @@ func TestSuccessfulCreateMessage(t *testing.T) {
 		channel := createChannel(t, "Channel")
 
 		// Create data for the new message.
-		newMessage := handlers.NewMessageRequest{Message: "New Message"}
+		newMessage := handlers.CreateMessageRequest{Message: "New Message"}
 
 		// Make the request to create the message.
 		url := fmt.Sprintf("/channels/%d/messages", channel.ID)

@@ -8,8 +8,13 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type CreateMessageRequest struct {
+	Message string `validate:"required"`
+}
 
 type createMessage struct {
 	queries *queries.Queries
@@ -18,10 +23,6 @@ type createMessage struct {
 func NewCreateMessage(db *pgxpool.Pool) *createMessage {
 	q := queries.New(db)
 	return &createMessage{queries: q}
-}
-
-type NewMessageRequest struct {
-	Message string
 }
 
 func (cm createMessage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -65,9 +66,16 @@ func (cm createMessage) channelExists(w http.ResponseWriter, c context.Context, 
 }
 
 func (cm createMessage) createMessage(w http.ResponseWriter, r *http.Request, channelId int64) error {
-	var req NewMessageRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	var newMessage CreateMessageRequest
+	err := json.NewDecoder(r.Body).Decode(&newMessage)
 
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return err
+	}
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err = validate.Struct(newMessage)
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return err
@@ -75,7 +83,7 @@ func (cm createMessage) createMessage(w http.ResponseWriter, r *http.Request, ch
 
 	createParams := queries.CreateMessageParams{
 		ChannelID: channelId,
-		Message:   req.Message,
+		Message:   newMessage.Message,
 	}
 
 	_, err = cm.queries.CreateMessage(r.Context(), createParams)

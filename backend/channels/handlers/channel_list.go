@@ -9,14 +9,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func writeJsonResponse(w http.ResponseWriter, data any) {
+func writeJsonResponse(w http.ResponseWriter, data any) error {
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(data)
 
 	if err != nil {
 		slog.Error("Unable to encode json", "error", err)
 		internalServerError(w)
+		return err
 	}
+
+	return nil
 }
 
 func internalServerError(w http.ResponseWriter) {

@@ -26,33 +26,44 @@ func NewCreateMessage(db *pgxpool.Pool) *createMessage {
 }
 
 func (cm createMessage) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Get the channel id.
-	idStr := r.PathValue("id")
-
-	// Check that the channel id is an integer.
-	channelId, err := strconv.ParseInt(idStr, 10, 64)
+	cId, err := cm.getChannelId(w, r)
 	if err != nil {
-		http.Error(w, "Invalid channel id", http.StatusUnprocessableEntity)
 		return
 	}
 
-	if !cm.channelExists(w, r.Context(), channelId) {
+	if !cm.channelExists(w, r.Context(), cId) {
 		return
 	}
 
-	err = cm.createMessage(w, r, channelId)
+	msg, err := cm.createMessage(w, r, cId)
 	if err != nil {
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	err = writeJsonResponse(w, msg)
+	if err != nil {
+		return
+	}
+}
+
+func (cm createMessage) getChannelId(w http.ResponseWriter, r *http.Request) (int64, error) {
+	idStr := r.PathValue("id")
+
+	cId, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid channel id", http.StatusUnprocessableEntity)
+		return 0, err
+	}
+
+	return cId, nil
 }
 
 func (cm createMessage) channelExists(w http.ResponseWriter, c context.Context, channelId int64) bool {
 	// Check that the channel exists
 	exists, err := cm.queries.ChannelExists(c, channelId)
 	if err != nil {
-		slog.Error("Failed to query for channel: %w", "err", err)
+		slog.Error("Failed to query for channel: %w", "error", err)
 		internalServerError(w)
 		return false
 	}
@@ -65,33 +76,34 @@ func (cm createMessage) channelExists(w http.ResponseWriter, c context.Context, 
 	return true
 }
 
-func (cm createMessage) createMessage(w http.ResponseWriter, r *http.Request, channelId int64) error {
-	var newMessage CreateMessageRequest
-	err := json.NewDecoder(r.Body).Decode(&newMessage)
+func (cm createMessage) createMessage(w http.ResponseWriter, r *http.Request, channelId int64) (*queries.Message, error) {
+	var newMsg CreateMessageRequest
+	err := json.NewDecoder(r.Body).Decode(&newMsg)
 
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return err
+		return nil, err
 	}
 
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	err = validate.Struct(newMessage)
+	err = validate.Struct(newMsg)
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return err
+
+		return nil, err
 	}
 
 	createParams := queries.CreateMessageParams{
 		ChannelID: channelId,
-		Message:   newMessage.Message,
+		Message:   newMsg.Message,
 	}
 
-	_, err = cm.queries.CreateMessage(r.Context(), createParams)
+	msg, err := cm.queries.CreateMessage(r.Context(), createParams)
 	if err != nil {
-		slog.Error("Failed to insert message into database", "err", err)
+		slog.Error("Failed to insert message into database", "error", err)
 		internalServerError(w)
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &msg, nil
 }

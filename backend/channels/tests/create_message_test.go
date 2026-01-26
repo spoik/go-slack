@@ -1,8 +1,10 @@
 package tests
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-slack/channels/handlers"
+	"go-slack/channels/queries"
 	"net/http"
 	"testing"
 
@@ -64,11 +66,11 @@ func TestSuccessfulCreateMessage(t *testing.T) {
 		channel := createChannel(t, "Channel")
 
 		// Create data for the new message.
-		newMessage := handlers.CreateMessageRequest{Message: "New Message"}
+		newMsg := handlers.CreateMessageRequest{Message: "New Message"}
 
 		// Make the request to create the message.
 		url := fmt.Sprintf("/channels/%d/messages", channel.ID)
-		respRec := ts.MakeJsonRequest(t, "POST", url, newMessage)
+		respRec := ts.MakeJsonRequest(t, "POST", url, newMsg)
 
 		// Assert the http status code is a 201.
 		assert.Equal(t, http.StatusCreated, respRec.Code)
@@ -77,14 +79,30 @@ func TestSuccessfulCreateMessage(t *testing.T) {
 
 		// Get the most recent message in the channel and assert it's
 		// data matches the data posted in the request.
-		messages, error := q.MessagesInChannel(tr.Context(), channel.ID)
+		dbMsgs, err := q.MessagesInChannel(tr.Context(), channel.ID)
 
-		if error != nil {
-			t.Fatal("Failed to fetch channel messages")
+		if err != nil {
+			t.Fatal("Failed to fetch channel messages", err)
 			return
 		}
 
-		message := messages[len(messages)-1]
-		assert.Equal(t, newMessage.Message, message.Message)
+		dbMsg := dbMsgs[len(dbMsgs)-1]
+		assert.Equal(t, newMsg.Message, dbMsg.Message)
+
+		var responseMessage queries.Message
+		err = json.NewDecoder(respRec.Body).Decode(&responseMessage)
+		if err != nil {
+			t.Fatal("Failed to decode response JSON", err)
+			return
+		}
+
+		assert.Equal(t, dbMsg.ID, responseMessage.ID)
+		assert.Equal(t, dbMsg.ChannelID, responseMessage.ChannelID)
+		assert.Equal(t, dbMsg.Message, responseMessage.Message)
+		assert.True(
+			t,
+			dbMsg.CreatedAt.Time.Equal(responseMessage.CreatedAt.Time),
+			"The database CreatedAt time differs from the response CreatedAt.",
+		)
 	})
 }

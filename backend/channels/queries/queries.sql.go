@@ -22,6 +22,17 @@ func (q *Queries) ChannelExists(ctx context.Context, id int64) (bool, error) {
 	return exists, err
 }
 
+const countChannels = `-- name: CountChannels :one
+SELECT COUNT(*) FROM channels
+`
+
+func (q *Queries) CountChannels(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countChannels)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countMessages = `-- name: CountMessages :one
 SELECT COUNT(*) FROM messages
 `

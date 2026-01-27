@@ -3,6 +3,9 @@ SELECT *
 FROM channels
 ORDER BY name ASC;
 
+-- name: CountChannels :one
+SELECT COUNT(*) FROM channels;
+
 -- name: CreateChannel :one
 INSERT INTO channels (name)
 VALUES ($1)

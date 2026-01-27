@@ -1,7 +1,9 @@
 package tests
 
 import (
+	"encoding/json"
 	"go-slack/channels/handlers"
+	"go-slack/channels/queries"
 	"net/http"
 	"testing"
 
@@ -38,7 +40,7 @@ func TestCreateChannelWithValidJSon(t *testing.T) {
 
 		data := handlers.CreateChannelRequest{Name: "New channel"}
 		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
-		assert.Equal(t, http.StatusOK, r.Code)
+		assert.Equal(t, http.StatusCreated, r.Code)
 
 		assertNumChannels(t, 1)
 
@@ -49,9 +51,33 @@ func TestCreateChannelWithValidJSon(t *testing.T) {
 			return
 		}
 
-		assert.Equal(t, data.Name, channels[0].Name)
+		dbChan := channels[0]
+
+		assert.Equal(t, data.Name, dbChan.Name)
+
+		var respChan *queries.Channel
+		err = json.NewDecoder(r.Body).Decode(&respChan)
+
+		if err != nil {
+			t.Fatal("Unable to decode response Channel JSON", err)
+			return
+		}
+
+		assert.Equal(t, dbChan.ID, respChan.ID)
+		assert.Equal(t, dbChan.Name, respChan.Name)
 	})
 }
 
 func TestCreateChannelWithDuplicateChannelName(t *testing.T) {
+	tr.Test(func() {
+		chanName := "Name"
+		q.CreateChannel(tr.Context(), chanName)
+		assertNumChannels(t, 1)
+
+		data := handlers.CreateChannelRequest{Name: chanName}
+		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
+		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
+
+		assertNumChannels(t, 1)
+	})
 }

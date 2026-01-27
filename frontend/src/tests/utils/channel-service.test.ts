@@ -1,6 +1,6 @@
 import { vi, describe, it, expect } from 'vitest'
 import axios from 'axios'
-import { getChannels, getMessages, type Channel, Message } from '@/utils/channel-service'
+import { getChannels, getMessages, createChannel, type Channel, Message } from '@/utils/channel-service'
 
 // Mock axios
 vi.mock('axios')
@@ -21,6 +21,23 @@ describe('channel-service', () => {
     })
   })
 
+  describe('createChannel', () => {
+    it('makes a network call to create the channel', async () => {
+      const channelName = "Channel name"
+      const mockChannel: Channel = { id: '1', name: channelName }
+      vi.mocked(axios.post).mockResolvedValue({ data: mockChannel })
+
+      const returnedChannel = await createChannel(channelName)
+
+      const expectedData = { name: channelName }
+      expect(axios.post).toHaveBeenCalledWith('http://localhost:8000/channels', expectedData)
+
+      expect(returnedChannel.id).toEqual(mockChannel.id)
+      expect(returnedChannel.name).toEqual(mockChannel.name)
+    })
+
+  })
+
   describe('getChannelMessages', () => {
     it('should call axios.get with the correct URL', async () => {
       const channelId = "4"
@@ -28,8 +45,8 @@ describe('channel-service', () => {
         new Message('1', 'message 1', new Date()),
         new Message('2', 'message 2', new Date())
       ]
-      
-      vi.mocked(axios.get).mockResolvedValue({ data: mockMessages})
+
+      vi.mocked(axios.get).mockResolvedValue({ data: mockMessages })
 
       const messages = await getMessages(channelId)
 

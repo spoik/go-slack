@@ -2,13 +2,20 @@ import 'reflect-metadata'
 import axios from 'axios'
 import { plainToInstance, Type } from 'class-transformer'
 
+const host = 'http://localhost:8000'
+
 export interface Channel {
 	readonly id: string;
 	name: string;
 }
 
 export async function getChannels(): Promise<Channel[]> {
-	const { data } = await axios.get<Channel[]>('http://localhost:8000/channels')
+	const { data } = await axios.get<Channel[]>(`${host}/channels`)
+	return data
+}
+
+export async function createChannel(name: string): Promise<Channel> {
+	const { data } = await axios.post<Channel>(`${host}/channels`, { name })
 	return data
 }
 
@@ -37,6 +44,6 @@ export class Message {
 }
 
 export async function getMessages(channelId: string): Promise<Message[]> {
-	const { data } = await axios.get<MessageData[]>(`http://localhost:8000/channels/${channelId}/messages`)
+	const { data } = await axios.get<MessageData[]>(`${host}/channels/${channelId}/messages`)
 	return plainToInstance(Message, data)
 }

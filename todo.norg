@@ -1,1 +1,2 @@
 - ( ) Create API endpoint to create a new channel
+- ( ) Update vitest and vite dev server to do typechecking. Removing the "| null" typing from the channels watcher in ChannelList is a way to tests this.

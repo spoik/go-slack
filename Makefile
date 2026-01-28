@@ -4,7 +4,6 @@ export GID := $(shell id -g)
 
 DOCKER_DEV=docker compose -p go-slack-dev -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev
 DOCKER_TEST=docker compose -p go-slack-test -f docker-compose.yml -f docker-compose.test.yml --env-file .env.test
-MIGRATE_CONFIG=-path migrations -database $$DB_URL
 
 .PHONY: help
 .DEFAULT_GOAL := help

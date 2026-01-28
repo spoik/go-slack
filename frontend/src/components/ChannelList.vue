@@ -10,7 +10,10 @@ const props = defineProps<{ selectedChannel?: Channel }>()
 const { selectedChannel } = toRefs(props)
 
 const channels = ref<Channel[] | null>(null)
-watch(channels, (newValue: Channel[]) => {
+watch(channels, (newValue: Channel[] | null) => {
+    if (channels.value == null || newValue == null) {
+        return
+    }
     channels.value = newValue.sort((a, b) => a.name.localeCompare(b.name))
 }, { deep: true })
 
@@ -32,6 +35,9 @@ async function loadChannels() {
 
 async function createNewChannel() {
     const newChannel = await createChannel(newChannelName.value)
+    if (channels.value == null) {
+        channels.value = []
+    }
     channels.value.push(newChannel)
     showCreateChannel.value = false
 }

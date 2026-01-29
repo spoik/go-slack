@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, toRefs, watch } from "vue"
-import { getChannels, createChannel, type Channel } from "@/utils/channel-service"
-import { AxiosError } from "axios";
+import { getChannels, type Channel } from "@/utils/channel-service"
+import CreateChannel from "./CreateChannel.vue";
 
 const emit = defineEmits<{
     channelSelected: [channel: Channel]
@@ -15,6 +15,7 @@ watch(channels, (newValue: Channel[] | null) => {
     if (channels.value == null || newValue == null) {
         return
     }
+    
     channels.value = newValue.sort((a, b) => a.name.localeCompare(b.name))
 }, { deep: true })
 
@@ -22,10 +23,6 @@ const loadChannelsError = ref<string | null>(null)
 const loading = computed((): boolean => {
     return loadChannelsError.value == null && channels.value == null
 })
-
-const showCreateChannel = ref<boolean>(false)
-const newChannelError = ref<string | null>(null)
-const newChannelName = ref<string>('')
 
 async function loadChannels() {
     try {
@@ -35,24 +32,12 @@ async function loadChannels() {
     }
 }
 
-async function createNewChannel() {
-    let newChannel: Channel
-    try {
-        newChannel = await createChannel(newChannelName.value)
-    } catch (error: any) {
-        if (error instanceof AxiosError && error.response != undefined) {
-            newChannelError.value = error.response.data
-        } else {
-            newChannelError.value = "Failed to create channel. Please try again."
-        }
-        return
-    }
-
+function channelCreated(channel: Channel) {
     if (channels.value == null) {
         channels.value = []
     }
-    channels.value.push(newChannel)
-    showCreateChannel.value = false
+
+    channels.value.push(channel)
 }
 
 onMounted(loadChannels)
@@ -76,19 +61,7 @@ onMounted(loadChannels)
                 </li>
             </ul>
 
-            <button v-if="!showCreateChannel" @click="showCreateChannel = true" data-test="create channel button">+
-                create channel</button>
-
-            <form v-if="showCreateChannel" @submit.prevent="createNewChannel" class="flex flex-row gap-4"
-                data-test="create channel form">
-                <label for="name" class="sr-only">New Channel Name</label>
-                <input type="text" name="name" placeholder="New channel name" v-model="newChannelName"
-                    class="grow min-w-0 border p-1" data-test="channel name input" />
-                <input type="submit" class="bg-indigo-400 px-4" data-test="new channel submit" />
-            </form>
-
-            <p v-if="newChannelError != null" class="text-red-400" data-test="create channel error">{{ newChannelError
-            }}</p>
+            <CreateChannel @channel-created="channelCreated"/>
         </div>
     </div>
 </template>

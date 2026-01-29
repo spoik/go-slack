@@ -6,6 +6,7 @@ import App from '@/App.vue'
 import { getChannels, type Channel } from '@/utils/channel-service'
 import  ChannelList from '@/components/ChannelList.vue'
 import  CurrentChannel from '@/components/CurrentChannel.vue'
+import { nextTick } from 'vue'
 
 vi.mock('@/utils/channel-service')
 
@@ -28,7 +29,8 @@ describe('App component', () => {
         expect(currentChannl.props('channel')).toEqual(undefined)
         expect(channelList.props('selectedChannel')).toEqual(undefined)
 
-        await channelList.vm.$emit('channelSelected', testChannels[1])
+        channelList.vm.$emit('channelSelected', testChannels[1])
+        await nextTick()
         
         expect(currentChannl.props('channel')).toEqual(testChannels[1])
         expect(channelList.props('selectedChannel')).toEqual(testChannels[1])

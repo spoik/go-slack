@@ -29,8 +29,24 @@ func TestCreateChannelWithInvalidJSON(t *testing.T) {
 		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
 
 		assert.Equal(t, http.StatusBadRequest, r.Code)
+		assert.Equal(t, r.Body.String(), "Invalid JSON\n")
 
 		assertNumChannels(t, 0)
+	})
+}
+
+func TestCreateChannelWithDuplicateChannelName(t *testing.T) {
+	tr.Test(func() {
+		chanName := "Name"
+		q.CreateChannel(tr.Context(), chanName)
+		assertNumChannels(t, 1)
+
+		data := handlers.CreateChannelRequest{Name: chanName}
+		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
+		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
+		assert.Equal(t, r.Body.String(), "Channel name already taken.\n")
+
+		assertNumChannels(t, 1)
 	})
 }
 
@@ -65,19 +81,5 @@ func TestCreateChannelWithValidJSon(t *testing.T) {
 
 		assert.Equal(t, dbChan.ID, respChan.ID)
 		assert.Equal(t, dbChan.Name, respChan.Name)
-	})
-}
-
-func TestCreateChannelWithDuplicateChannelName(t *testing.T) {
-	tr.Test(func() {
-		chanName := "Name"
-		q.CreateChannel(tr.Context(), chanName)
-		assertNumChannels(t, 1)
-
-		data := handlers.CreateChannelRequest{Name: chanName}
-		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
-		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
-
-		assertNumChannels(t, 1)
 	})
 }

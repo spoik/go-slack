@@ -28,8 +28,8 @@ func TestCreateChannelWithInvalidJSON(t *testing.T) {
 		data := invalidRequest{invalidField: "value"}
 		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
 
-		assert.Equal(t, http.StatusBadRequest, r.Code)
-		assert.Equal(t, r.Body.String(), "Invalid JSON\n")
+		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
+		assert.Equal(t, "Name is a required field.\n", r.Body.String())
 
 		assertNumChannels(t, 0)
 	})
@@ -50,7 +50,7 @@ func TestCreateChannelWithDuplicateChannelName(t *testing.T) {
 	})
 }
 
-func TestCreateChannelWithValidJSon(t *testing.T) {
+func TestCreateChannelWithValidJSON(t *testing.T) {
 	tr.Test(func() {
 		assertNumChannels(t, 0)
 
@@ -81,5 +81,18 @@ func TestCreateChannelWithValidJSon(t *testing.T) {
 
 		assert.Equal(t, dbChan.ID, respChan.ID)
 		assert.Equal(t, dbChan.Name, respChan.Name)
+	})
+}
+
+func TestCreateChannelWithEmptyStringName(t *testing.T) {
+	tr.Test(func() {
+		assertNumChannels(t, 0)
+		data := handlers.CreateChannelRequest{Name: "   "}
+
+		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
+		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
+		assert.Equal(t, "Name must not be blank.\n", r.Body.String())
+
+		assertNumChannels(t, 0)
 	})
 }

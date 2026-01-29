@@ -6,7 +6,6 @@ import { mount, shallowMount, VueWrapper } from '@vue/test-utils'
 import { getChannels, type Channel } from '@/utils/channel-service'
 import ChannelList from '@/components/ChannelList.vue'
 import CreateChannel from '@/components/CreateChannel.vue'
-import { wrap } from 'module'
 
 vi.mock('@/utils/channel-service')
 

@@ -12,6 +12,8 @@ const errorMessage = ref<string | null>(null)
 const newChannelName = ref<string>('')
 
 async function createNewChannel() {
+    errorMessage.value = null
+
     let newChannel: Channel
 
     try {

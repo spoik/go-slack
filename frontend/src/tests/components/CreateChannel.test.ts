@@ -146,6 +146,23 @@ describe('CreateChannel component', () => {
 				const emittedChannel = wrapper.emitted('channelCreated')?.[0]?.[0]
 				expect(emittedChannel).toEqual(newChannel)
 			})
+
+			describe('when a error from a previous attempt to create a channel is present', () => {
+				beforeEach(() => {
+					vi.mocked(createChannel).mockRejectedValue(new Error("error"))
+					formElement(wrapper).trigger('submit')
+				})
+
+				it('removes the old error message', async () => {
+					expect(createChannelError(wrapper).exists()).toBe(true)
+
+					vi.mocked(createChannel).mockResolvedValue({ id: '1', name: 'Test' })
+					formElement(wrapper).trigger('submit')
+					await nextTick()
+
+					expect(createChannelError(wrapper).exists()).toBe(false)
+				})
+			})
 		})
 	})
 })

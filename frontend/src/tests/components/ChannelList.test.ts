@@ -5,6 +5,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { getChannels, createChannel, type Channel } from '@/utils/channel-service'
 import ChannelList from '@/components/ChannelList.vue'
+import { AxiosError, AxiosHeaders } from 'axios'
 
 vi.mock('@/utils/channel-service')
 
@@ -137,16 +138,71 @@ describe('ChannelList component', () => {
 
 		describe('submitting the form', () => {
 			beforeEach(async () => {
-				vi.mocked(createChannel).mockResolvedValue({ id: "1", name: "Anything" })
 				wrapper.get('[data-test="create channel button"]').trigger('click')
 				await nextTick()
 			})
 
 			it('makes a request to create a new channel when the channel form is submitted', async () => {
+				vi.mocked(createChannel).mockResolvedValue({ id: "1", name: "Anything" })
 				const channelName = "New channel"
 				wrapper.get('[data-test="channel name input"]').setValue(channelName)
 				wrapper.get('[data-test="create channel form"]').trigger("submit")
 				expect(createChannel).toHaveBeenCalledWith(channelName)
+			})
+
+			describe('when the new channel failed to be created', () => {
+				beforeEach(() => {
+					vi.mocked(createChannel).mockRejectedValue(new Error("error"))
+				})
+
+				async function submitNewChannel() {
+					wrapper.get('[data-test="channel name input"]').setValue("anything")
+					wrapper.get('[data-test="create channel form"]').trigger("submit")
+					await nextTick()
+				}
+
+				it('does not hide the create channel form', async () => {
+					expect(wrapper.find('[data-test="create channel form"]').exists()).toBe(true)
+					await submitNewChannel()
+					expect(wrapper.find('[data-test="create channel form"]').exists()).toBe(true)
+				})
+
+				describe('when a generic error is returned', () => {
+					it('shows a generic error message', async () => {
+						expect(wrapper.find('[data-test="create channel error"]').exists()).toBe(false)
+						await submitNewChannel()
+						expect(wrapper.find('[data-test="create channel error"]').exists()).toBe(true)
+						expect(wrapper.get('[data-test="create channel error"]').text()).toEqual("Failed to create channel. Please try again.")
+					})
+				})
+
+				describe('when an AxiosError is returned', () => {
+					var error: AxiosError
+					var errorMessage: string
+					beforeEach(() => {
+						errorMessage = "Axios error messsage"
+						error = new AxiosError(
+							'error',
+							'error',
+							undefined,
+							undefined,
+							{
+								data: errorMessage,
+								status: 422,
+								statusText: 'Unprocessible entity',
+								headers: new AxiosHeaders(),
+								config: { headers: new AxiosHeaders() }
+							}
+						)
+						vi.mocked(createChannel).mockRejectedValue(error)
+					})
+
+					it('shows the error message in the AxiosError', async () => {
+						await submitNewChannel()
+						expect(wrapper.find('[data-test="create channel error"]').exists()).toBe(true)
+						expect(wrapper.get('[data-test="create channel error"]').text()).toEqual(errorMessage)
+					})
+				})
 			})
 
 			describe('when the new channel was created successfully', () => {

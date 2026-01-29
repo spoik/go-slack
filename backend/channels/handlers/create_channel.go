@@ -46,7 +46,7 @@ func (cc createChannel) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			http.Error(w, "Channel name already taken", http.StatusUnprocessableEntity)
+			http.Error(w, "Channel name already taken.", http.StatusUnprocessableEntity)
 			return
 		}
 

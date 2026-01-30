@@ -22,6 +22,10 @@ func New(ctx context.Context, db *pgxpool.Pool) *TestServer {
 	return &ts
 }
 
+func (ts TestServer) Mux() *http.ServeMux {
+	return ts.mux
+}
+
 func (ts TestServer) MakeRequest(t *testing.T, method string, url string) *httptest.ResponseRecorder {
 	respRec := httptest.NewRecorder()
 	req := createRequest(t, method, url)
@@ -31,7 +35,7 @@ func (ts TestServer) MakeRequest(t *testing.T, method string, url string) *httpt
 
 func (ts TestServer) MakeJsonRequest(t *testing.T, method string, url string, data any) *httptest.ResponseRecorder {
 	respRec := httptest.NewRecorder()
-	req := createJsonRequest(t, method, url, data)
+	req := CreateJsonRequest(t, method, url, data)
 	ts.mux.ServeHTTP(respRec, req)
 	return respRec
 }
@@ -46,7 +50,7 @@ func createRequest(t *testing.T, method string, url string) *http.Request {
 	return req
 }
 
-func createJsonRequest(t *testing.T, method string, url string, data any) *http.Request {
+func CreateJsonRequest(t *testing.T, method string, url string, data any) *http.Request {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		t.Fatal("Unable to marshal data to JSON for", method, "to", url)

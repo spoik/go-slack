@@ -4,15 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"go-slack/channels/queries"
+	"go-slack/validation"
 	"log/slog"
 	"net/http"
-	"strings"
 
-	"github.com/go-playground/locales/en"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
-	"github.com/go-playground/validator/v10/non-standard/validators"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -39,8 +34,7 @@ func (cc createChannel) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = validateNewChannel(w, newChan)
-	if err != nil {
+	if !validateNewChannel(w, r, newChan) {
 		return
 	}
 
@@ -62,55 +56,20 @@ func (cc createChannel) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(createdChan)
 }
 
-func validateNewChannel(w http.ResponseWriter, newChan CreateChannelRequest) error {
-	en := en.New()
-	uni := ut.New(en, en)
-	trans, _ := uni.GetTranslator("en")
-
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	en_translations.RegisterDefaultTranslations(validate, trans)
-	err := validate.RegisterValidation("notblank", validators.NotBlank)
-	if err != nil {
-		slog.Error("Unable to register notblank validation", "error", err)
-		internalServerError(w)
-		return err
-	}
-
-	validate.RegisterTranslation("notblank", trans, func(ut ut.Translator) error {
-		return ut.Add("notblank", "{0} must not be blank", true)
-	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("notblank", fe.Field())
-		return t
-	})
-
-	err = validate.Struct(newChan)
+func validateNewChannel(w http.ResponseWriter, r *http.Request, newChan CreateChannelRequest) bool {
+	err := validation.Validate.Struct(newChan)
 	if err == nil {
-		return nil
+		return true
 	}
 
-	var invalidValidationError *validator.InvalidValidationError
-	if errors.As(err, &invalidValidationError) {
-		slog.Error("")
+	errMsg, err := validation.ValidationErrorsToString(r, err)
+
+	if err != nil {
+		slog.Error("Failed to convert validation errors to a string", "error", err)
 		internalServerError(w)
-		return err
+		return false
 	}
 
-	var validateErrs validator.ValidationErrors
-	if errors.As(err, &validateErrs) {
-		errMsgs := make([]string, len(validateErrs))
-		for _, error := range validateErrs {
-			errMsg := error.Translate(trans) + "."
-			errMsgs = append(errMsgs, errMsg)
-		}
-
-		errMsg := strings.TrimSpace(strings.Join(errMsgs, " "))
-
-		http.Error(w, errMsg, http.StatusUnprocessableEntity)
-		return err
-	}
-
-	slog.Error("validation failed", "error", err)
-	http.Error(w, "Invalid JSON", http.StatusUnprocessableEntity)
-
-	return err
+	http.Error(w, errMsg, http.StatusUnprocessableEntity)
+	return false
 }

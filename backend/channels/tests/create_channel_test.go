@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"go-slack/channels/handlers"
 	"go-slack/channels/queries"
+	"go-slack/testutils/testserver"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -92,6 +94,24 @@ func TestCreateChannelWithEmptyStringName(t *testing.T) {
 		r := ts.MakeJsonRequest(t, "POST", "/channels", data)
 		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
 		assert.Equal(t, "Name must not be blank.\n", r.Body.String())
+
+		assertNumChannels(t, 0)
+	})
+}
+
+func TestCreateChannelWithEmptyStringNameAndGermanLanguage(t *testing.T) {
+	tr.Test(func() {
+		assertNumChannels(t, 0)
+		data := handlers.CreateChannelRequest{Name: "   "}
+
+		r := httptest.NewRecorder()
+
+		req := testserver.CreateJsonRequest(t, "POST", "/channels", data)
+		req.Header.Add("Accept-Language", "de")
+		tr.TestServer().Mux().ServeHTTP(r, req)
+
+		assert.Equal(t, http.StatusUnprocessableEntity, r.Code)
+		assert.Equal(t, "Der Name darf nicht leer sein.\n", r.Body.String())
 
 		assertNumChannels(t, 0)
 	})

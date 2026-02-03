@@ -2,10 +2,11 @@
 
 import { nextTick } from 'vue'
 import { type Mock } from 'vitest'
-import { mount, VueWrapper } from '@vue/test-utils'
+import { shallowMount, VueWrapper } from '@vue/test-utils'
 import CurrentChannel from '@/components/CurrentChannel.vue'
 import * as channelService from "@/utils/channel-service"
 import { Message, type Channel } from "@/utils/channel-service"
+import CreateMessage from '@/components/CreateMessage.vue'
 
 describe('CurrentChannel component', () => {
     let getMessagesMocked: Mock<(channelId: string) => Promise<Message[]>>
@@ -22,7 +23,7 @@ describe('CurrentChannel component', () => {
         let wrapper: VueWrapper<InstanceType<typeof CurrentChannel>>
 
         beforeEach(() => {
-            wrapper = mount(CurrentChannel, {
+            wrapper = shallowMount(CurrentChannel, {
                 props: {
                     channel: undefined
                 }
@@ -39,6 +40,10 @@ describe('CurrentChannel component', () => {
         it('does not make a request to get the messages in a channel', () => {
             expect(getMessagesMocked).not.toHaveBeenCalled()
         })
+
+        it('does not show the CreateMessage component', () => {
+            expect(wrapper.findComponent(CreateMessage).exists()).toBe(false)
+        })
     })
 
     describe('when a channel is provided', () => {
@@ -47,7 +52,7 @@ describe('CurrentChannel component', () => {
         async function initWrapper(): Promise<VueWrapper<InstanceType<typeof CurrentChannel>>> {
             channel = { id: '1', name: 'general' }
 
-            const wrapper = mount(CurrentChannel, {
+            const wrapper = shallowMount(CurrentChannel, {
                 props: {
                     channel
                 }
@@ -62,6 +67,15 @@ describe('CurrentChannel component', () => {
             mockGetMessages([])
             initWrapper()
             expect(getMessagesMocked).toHaveBeenCalledWith(channel.id)
+        })
+
+        it('shows the CreateMessage component and passes it the channel', async () => {
+            mockGetMessages([])
+            const wrapper = await initWrapper()
+
+            const createMesssageComponent = wrapper.findComponent(CreateMessage)
+            expect(createMesssageComponent.exists()).toBe(true)
+            expect(createMesssageComponent.props("channel")).toEqual(channel)
         })
 
         describe('when the messages failed to load', () => {
@@ -140,7 +154,7 @@ describe('CurrentChannel component', () => {
         async function initWrapper(): Promise<VueWrapper<InstanceType<typeof CurrentChannel>>> {
             mockGetMessages(channel1Messages)
 
-            const wrapper = mount(CurrentChannel, {
+            const wrapper = shallowMount(CurrentChannel, {
                 props: {
                     channel: channel1
                 }

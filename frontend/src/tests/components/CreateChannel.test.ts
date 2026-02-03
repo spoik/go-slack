@@ -51,11 +51,16 @@ describe('CreateChannel component', () => {
 			await nextTick()
 		})
 
+		async function submitNewChannel(channelName: string = "anything") {
+			channelNameInput(wrapper).setValue(channelName)
+			formElement(wrapper).trigger("submit")
+			await nextTick()
+		}
+
 		it('makes a request to create a new channel when the channel form is submitted', async () => {
 			vi.mocked(createChannel).mockResolvedValue({ id: "1", name: "Anything" })
 			const channelName = "New channel"
-			channelNameInput(wrapper).setValue(channelName)
-			formElement(wrapper).trigger("submit")
+			submitNewChannel(channelName)
 			expect(createChannel).toHaveBeenCalledWith(channelName)
 		})
 
@@ -63,12 +68,6 @@ describe('CreateChannel component', () => {
 			beforeEach(() => {
 				vi.mocked(createChannel).mockRejectedValue(new Error("error"))
 			})
-
-			async function submitNewChannel() {
-				channelNameInput(wrapper).setValue("anything")
-				formElement(wrapper).trigger("submit")
-				await nextTick()
-			}
 
 			it('does not hide the create channel form', async () => {
 				expect(formElement(wrapper).exists()).toBe(true)

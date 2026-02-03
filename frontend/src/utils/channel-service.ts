@@ -20,7 +20,7 @@ export async function createChannel(name: string): Promise<Channel> {
 }
 
 interface MessageData {
-	readonly id: string;
+	readonly id: string
 	message: string;
 	created_at: string;
 }
@@ -45,5 +45,10 @@ export class Message {
 
 export async function getMessages(channelId: string): Promise<Message[]> {
 	const { data } = await axios.get<MessageData[]>(`${host}/channels/${channelId}/messages`)
+	return plainToInstance(Message, data)
+}
+
+export async function createMessage(channelId: string, message: string): Promise<Message> {
+	const { data } = await axios.post<MessageData>(`${host}/channels/${channelId}/messages`, { message })
 	return plainToInstance(Message, data)
 }

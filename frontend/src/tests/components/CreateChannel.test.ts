@@ -60,8 +60,28 @@ describe('CreateChannel component', () => {
 		it('makes a request to create a new channel when the channel form is submitted', async () => {
 			vi.mocked(createChannel).mockResolvedValue({ id: "1", name: "Anything" })
 			const channelName = "New channel"
-			submitNewChannel(channelName)
+			await submitNewChannel(channelName)
 			expect(createChannel).toHaveBeenCalledWith(channelName)
+		})
+
+		describe('with an empty channel name', () => {
+			it('shows an error message', async () => {
+				expect(createChannelError(wrapper).exists()).toBe(false)
+				await submitNewChannel("")
+				expect(createChannelError(wrapper).exists()).toBe(true)
+				expect(createChannel).not.toHaveBeenCalled()
+				expect(createChannelError(wrapper).text()).toEqual('Please enter a channel name.')
+			})
+		})
+
+		describe('with a channel name containing all whitespace', () => {
+			it('shows an error message', async () => {
+				expect(createChannelError(wrapper).exists()).toBe(false)
+				await submitNewChannel(" \t\n\r")
+				expect(createChannelError(wrapper).exists()).toBe(true)
+				expect(createChannel).not.toHaveBeenCalled()
+				expect(createChannelError(wrapper).text()).toEqual('Please enter a channel name.')
+			})
 		})
 
 		describe('when the new channel failed to be created', () => {
@@ -120,17 +140,11 @@ describe('CreateChannel component', () => {
 				vi.mocked(createChannel).mockResolvedValue(newChannel)
 			})
 
-			async function submitNewChannel() {
-				channelNameInput(wrapper).setValue(newChannel.name)
-				formElement(wrapper).trigger("submit")
-				await nextTick()
-			}
-
 			it('hides the new channel form', async () => {
 				expect(formElement(wrapper).exists()).toBe(true)
 				expect(createChannelButton(wrapper).exists()).toBe(false)
 
-				await submitNewChannel()
+				await submitNewChannel(newChannel.name)
 
 				expect(formElement(wrapper).exists()).toBe(false)
 				expect(createChannelButton(wrapper).exists()).toBe(true)
@@ -139,7 +153,7 @@ describe('CreateChannel component', () => {
 			it('emits the newly created channel', async () => {
 				expect(wrapper.emitted('channelSelected')).toBeFalsy()
 
-				await submitNewChannel()
+				await submitNewChannel(newChannel.name)
 
 				expect(wrapper.emitted('channelCreated')).toBeTruthy()
 				const emittedChannel = wrapper.emitted('channelCreated')?.[0]?.[0]
@@ -147,16 +161,16 @@ describe('CreateChannel component', () => {
 			})
 
 			describe('when a error from a previous attempt to create a channel is present', () => {
-				beforeEach(() => {
+				beforeEach(async () => {
 					vi.mocked(createChannel).mockRejectedValue(new Error("error"))
-					formElement(wrapper).trigger('submit')
+					await submitNewChannel()
 				})
 
 				it('removes the old error message', async () => {
 					expect(createChannelError(wrapper).exists()).toBe(true)
 
 					vi.mocked(createChannel).mockResolvedValue({ id: '1', name: 'Test' })
-					formElement(wrapper).trigger('submit')
+					await submitNewChannel()
 					await nextTick()
 
 					expect(createChannelError(wrapper).exists()).toBe(false)

@@ -14,6 +14,11 @@ const newChannelName = ref<string>('')
 async function createNewChannel() {
     errorMessage.value = null
 
+    if (newChannelName.value.trim() == "") {
+        errorMessage.value = "Please enter a channel name."
+        return
+    }
+
     let newChannel: Channel
 
     try {

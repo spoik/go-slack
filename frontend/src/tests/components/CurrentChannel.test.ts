@@ -8,6 +8,8 @@ import * as channelService from "@/utils/channel-service"
 import { Message, type Channel } from "@/utils/channel-service"
 import CreateMessage from '@/components/CreateMessage.vue'
 
+type CurrentChannelWrapper = VueWrapper<InstanceType<typeof CurrentChannel>>
+
 describe('CurrentChannel component', () => {
     let getMessagesMocked: Mock<(channelId: string) => Promise<Message[]>>
 
@@ -20,7 +22,7 @@ describe('CurrentChannel component', () => {
     }
 
     describe('when a channel is not provided', () => {
-        let wrapper: VueWrapper<InstanceType<typeof CurrentChannel>>
+        let wrapper: CurrentChannelWrapper
 
         beforeEach(() => {
             wrapper = shallowMount(CurrentChannel, {
@@ -49,7 +51,7 @@ describe('CurrentChannel component', () => {
     describe('when a channel is provided', () => {
         let channel: Channel
 
-        async function initWrapper(): Promise<VueWrapper<InstanceType<typeof CurrentChannel>>> {
+        async function initWrapper(): Promise<CurrentChannelWrapper> {
             channel = { id: '1', name: 'general' }
 
             const wrapper = shallowMount(CurrentChannel, {
@@ -97,7 +99,7 @@ describe('CurrentChannel component', () => {
         })
 
         describe('when the channel has messages', () => {
-            let wrapper: VueWrapper<InstanceType<typeof CurrentChannel>>
+            let wrapper: CurrentChannelWrapper
             let messages: Message[]
 
             beforeEach(async () => {
@@ -131,6 +133,32 @@ describe('CurrentChannel component', () => {
                 expect(timeElement.text()).toEqual(messages[0]?.created_at.toLocaleString());
             });
         })
+
+        describe('when the CreateMessage component emits a newly created message', () => {
+            let wrapper: CurrentChannelWrapper
+
+            beforeEach(async () => {
+                const messages = [
+                    new Message("1", "Test 1", new Date()),
+                    new Message("2", "Test 2", new Date())
+                ]
+
+                mockGetMessages(messages)
+                wrapper = await initWrapper()
+            })
+
+            it('adds the message in the list of messages', async () => {
+                expect(wrapper.findAll('[data-test-message]').length).toEqual(2)
+
+                const newMessage = new Message("3", "Test 3", new Date())
+                wrapper.findComponent(CreateMessage).vm.$emit('messageCreated', newMessage)
+                await nextTick()
+
+                expect(wrapper.findAll('[data-test-message]').length).toEqual(3)
+                const newMessageElement = wrapper.findAll('[data-test-message]')[2]
+                expect(newMessageElement?.get('[data-test="message text"]').text()).toEqual(newMessage.message)
+            })
+        })
     })
 
     describe('when the channel is changed', () => {
@@ -151,7 +179,7 @@ describe('CurrentChannel component', () => {
             ]
         })
 
-        async function initWrapper(): Promise<VueWrapper<InstanceType<typeof CurrentChannel>>> {
+        async function initWrapper(): Promise<CurrentChannelWrapper> {
             mockGetMessages(channel1Messages)
 
             const wrapper = shallowMount(CurrentChannel, {
@@ -165,7 +193,7 @@ describe('CurrentChannel component', () => {
             return wrapper
         }
 
-        async function changeChannel(wrapper: VueWrapper<InstanceType<typeof CurrentChannel>>) {
+        async function changeChannel(wrapper: CurrentChannelWrapper) {
             await wrapper.setProps({ channel: channel2 })
             await nextTick()
         }

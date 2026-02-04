@@ -20,6 +20,10 @@ async function loadMessages() {
     }
 }
 
+function newMessageCreated(newMessage: Message) {
+    messages.value?.push(newMessage)
+}
+
 const hasMessages = computed(() => {
     return messages.value != undefined && messages.value.length > 0
 })
@@ -52,7 +56,7 @@ onMounted(loadMessages)
 
             <div class="mt-4">
                 <hr>
-                <CreateMessage class="mt-4" :channel="channel" />
+                <CreateMessage class="mt-4" :channel="channel" @message-created="newMessageCreated" />
             </div>
         </div>
     </div>

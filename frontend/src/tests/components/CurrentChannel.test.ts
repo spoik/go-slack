@@ -137,26 +137,48 @@ describe('CurrentChannel component', () => {
         describe('when the CreateMessage component emits a newly created message', () => {
             let wrapper: CurrentChannelWrapper
 
-            beforeEach(async () => {
-                const messages = [
-                    new Message("1", "Test 1", new Date()),
-                    new Message("2", "Test 2", new Date())
-                ]
+            async function emitNewMesasge(): Message {
+                const newMessage = new Message("3", "Test 3", new Date())
+                wrapper.findComponent(CreateMessage).vm.$emit('messageCreated', newMessage)
 
-                mockGetMessages(messages)
+                await nextTick()
+
+                return newMessage
+            }
+
+            beforeEach(async () => {
+                mockGetMessages([])
                 wrapper = await initWrapper()
             })
 
-            it('adds the message in the list of messages', async () => {
-                expect(wrapper.findAll('[data-test-message]').length).toEqual(2)
+            describe('when teh current channel has no messages', () => {
+                it('adds the message in the list of messages', async () => {
+                    expect(wrapper.findAll('[data-test-message]').length).toEqual(0)
+                    const newMessage = await emitNewMesasge()
+                    expect(wrapper.findAll('[data-test-message]').length).toEqual(1)
+                    const newMessageElement = wrapper.findAll('[data-test-message]')[0]
+                    expect(newMessageElement?.get('[data-test="message text"]').text()).toEqual(newMessage.message)
+                })
+            })
 
-                const newMessage = new Message("3", "Test 3", new Date())
-                wrapper.findComponent(CreateMessage).vm.$emit('messageCreated', newMessage)
-                await nextTick()
+            describe('when the current chanel already has messages', () => {
+                beforeEach(async () => {
+                    const messages = [
+                        new Message("1", "Test 1", new Date()),
+                        new Message("2", "Test 2", new Date())
+                    ]
 
-                expect(wrapper.findAll('[data-test-message]').length).toEqual(3)
-                const newMessageElement = wrapper.findAll('[data-test-message]')[2]
-                expect(newMessageElement?.get('[data-test="message text"]').text()).toEqual(newMessage.message)
+                    mockGetMessages(messages)
+                    wrapper = await initWrapper()
+                })
+
+                it('adds the message in the list of messages', async () => {
+                    expect(wrapper.findAll('[data-test-message]').length).toEqual(2)
+                    const newMessage = await emitNewMesasge()
+                    expect(wrapper.findAll('[data-test-message]').length).toEqual(3)
+                    const newMessageElement = wrapper.findAll('[data-test-message]')[2]
+                    expect(newMessageElement?.get('[data-test="message text"]').text()).toEqual(newMessage.message)
+                })
             })
         })
     })

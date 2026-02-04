@@ -1,9 +1,9 @@
-- (-) Create CreateMessage Vue Component
+- (x) Create CreateMessage Vue Component
 -- (x) Clear out message textarea when a message is successfully submitted.
 -- (x) Clear out error message when a message is successfully submitted.
 -- (x) Emit new message returned from the backend when the message it successfully submitted.
 -- (x) Submit form when enter is pressed but now when enter and a modifier is pressed.
--- ( ) Updated CurrentChannel component to show new messages emitted by the CreateMessage component.
+-- (x) Updated CurrentChannel component to show new messages emitted by the CreateMessage component.
 
 - ( ) Browser Address bar navigation
 -- ( ) Update browser address when a channel is chosen.

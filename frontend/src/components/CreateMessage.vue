@@ -21,6 +21,7 @@ async function createNewMessage() {
         return
     }
 
+    message.value = ""
     emit("messageCreated", newMessage)
 }
 </script>

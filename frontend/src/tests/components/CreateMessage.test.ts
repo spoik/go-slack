@@ -4,7 +4,6 @@ import { mount, type VueWrapper } from '@vue/test-utils'
 import CreateMessage from '@/components/CreateMessage.vue'
 import { type Channel, createMessage, Message } from '@/utils/channel-service'
 import { nextTick } from 'vue'
-import { wrap } from 'module'
 
 type CreateMessageWrapper = VueWrapper<InstanceType<typeof CreateMessage>>
 
@@ -25,9 +24,17 @@ describe('CreateMessage component', () => {
 
 	describe("submitting the form", () => {
 		async function submit(message: string) {
-			wrapper.find('textarea').setValue(message)
-			wrapper.find('form').trigger('submit')
+			messageBodyInput().setValue(message)
+			formElement().trigger('submit')
 			await nextTick()
+		}
+
+		function formElement() {
+			return wrapper.find('form')
+		}
+
+		function messageBodyInput() {
+			return wrapper.find('textarea')
 		}
 
 		function errorMessageElement() {
@@ -62,6 +69,17 @@ describe('CreateMessage component', () => {
 				await submit("Message")
 				expect(wrapper.emitted("messageCreated")).toBeUndefined()
 			})
+
+			it("does not clear out the message text from the from", async () => {
+				const message = "New message text"
+				messageBodyInput().setValue(message)
+				expect(messageBodyInput().element.value).toEqual(message)
+
+				formElement().trigger("submit")
+				await nextTick()
+
+				expect(messageBodyInput().element.value).toEqual(message)
+			})
 		})
 
 		describe('when the message is successfully created', () => {
@@ -80,6 +98,18 @@ describe('CreateMessage component', () => {
 				expect(wrapper.emitted("messageCreated")?.length).toEqual(1)
 				const emittedMessage = wrapper.emitted("messageCreated")?.[0]?.[0]
 				expect(emittedMessage).toEqual(message)
+			})
+
+			it("clears the new message textarea", async () => {
+				const newMessage = "New message body"
+				messageBodyInput().setValue(newMessage)
+				expect(messageBodyInput().element.value).toEqual(newMessage)
+
+				formElement().trigger("submit")
+				await nextTick()
+				await nextTick()
+
+				expect(messageBodyInput().element.value).toEqual("")
 			})
 
 			it("doesn't show the error message element", async () => {

@@ -1,7 +1,7 @@
-- ( ) Create CreateMessage Vue Component
--- ( ) Clear out message textarea when a message is successfully submitted.
+- (-) Create CreateMessage Vue Component
+-- (x) Clear out message textarea when a message is successfully submitted.
 -- ( ) Clear out error message when a message is successfully submitted.
--- ( ) Emit new message returned from the backend when the message it successfully submitted.
+-- (x) Emit new message returned from the backend when the message it successfully submitted.
 -- ( ) Updated CurrentChannel component to show new messages emitted by the CreateMessage component.
 - ( ) Real time channel messages
 -- ( ) Create server event endpoint for new messages posted to a channel.

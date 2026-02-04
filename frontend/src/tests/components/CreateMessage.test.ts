@@ -80,6 +80,24 @@ describe('CreateMessage component', () => {
 
 				expect(messageBodyInput().element.value).toEqual(message)
 			})
+
+			describe("then another message is submitted and is successful", () => {
+				let message: Message
+
+				beforeEach(async () => {
+					await submit("Message")
+
+					message = new Message("1", "Message body", new Date())
+					vi.mocked(createMessage).mockResolvedValueOnce(message)
+				})
+
+				it("hides the old error message", async () => {
+					wrapper.get('[data-error]')
+					expect(errorMessageElement().exists()).toBe(true)
+					await submit("New message")
+					expect(errorMessageElement().exists()).toBe(false)
+				})
+			})
 		})
 
 		describe('when the message is successfully created', () => {

@@ -21,6 +21,7 @@ async function createNewMessage() {
         return
     }
 
+    errorMessage.value = null
     message.value = ""
     emit("messageCreated", newMessage)
 }

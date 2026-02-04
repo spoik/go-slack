@@ -81,11 +81,20 @@ describe('CurrentChannel component', () => {
         })
 
         describe('when the messages failed to load', () => {
-            it('shows an error message', async () => {
+            let wrapper: CurrentChannelWrapper
+
+            beforeEach(async () => {
                 getMessagesMocked.mockRejectedValue(channel.id)
-                const wrapper = await initWrapper()
+                wrapper = await initWrapper()
+            })
+
+            it('shows an error message', async () => {
                 expect(wrapper.find('[data-test="error"]').exists()).toBe(true)
                 expect(wrapper.find('[data-test="messages empty message"]').exists()).toBe(false)
+            })
+
+            it('does not show the CreateMessage component', () => {
+                expect(wrapper.findComponent(CreateMessage).exists()).toBe(false)
             })
         })
 

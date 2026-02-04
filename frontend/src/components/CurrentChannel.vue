@@ -54,7 +54,7 @@ onMounted(loadMessages)
                 </ul>
             </div>
 
-            <div class="mt-4">
+            <div v-if="error == undefined" class="mt-4">
                 <hr>
                 <CreateMessage class="mt-4" :channel="channel" @message-created="newMessageCreated" />
             </div>

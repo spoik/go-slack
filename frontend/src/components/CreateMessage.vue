@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { createMessage, type Channel } from '@/utils/channel-service'
+import { createMessage, Message, type Channel } from '@/utils/channel-service'
 
 const props = defineProps<{ channel: Channel }>()
+const emit = defineEmits<{
+    messageCreated: [message: Message]
+}>()
+
+
 const message = ref<string>("")
 const errorMessage = ref<string | null>(null)
 
 async function createNewMessage() {
+    let newMessage: Message
+
     try {
-        await createMessage(props.channel.id, message.value)
+        newMessage = await createMessage(props.channel.id, message.value)
     } catch (error: any) {
         errorMessage.value = "Unable to create message. Please try again."
+        return
     }
+
+    emit("messageCreated", newMessage)
 }
 </script>
 

@@ -1,10 +1,17 @@
 - (-) Create CreateMessage Vue Component
 -- (x) Clear out message textarea when a message is successfully submitted.
--- ( ) Clear out error message when a message is successfully submitted.
+-- (x) Clear out error message when a message is successfully submitted.
 -- (x) Emit new message returned from the backend when the message it successfully submitted.
+-- (x) Submit form when enter is pressed but now when enter and a modifier is pressed.
 -- ( ) Updated CurrentChannel component to show new messages emitted by the CreateMessage component.
+
+- ( ) Browser Address bar navigation
+-- ( ) Update browser address when a channel is chosen.
+-- ( ) Automatically select a channel when the address bar contains a specific channel.
+
 - ( ) Real time channel messages
 -- ( ) Create server event endpoint for new messages posted to a channel.
 -- ( ) Updated CurrentChannel component to listen to new server events from new messages endpoint.
 -- ( ) Make sure to close and open a new connection to the server events when the current channel changes.
+
 - ( ) Update vitest and vite dev server to do typechecking. Removing the "| null" typing from the channels watcher in ChannelList is a way to tests this.

@@ -31,7 +31,7 @@ async function createNewMessage() {
     <div>
         <form @submit.prevent="createNewMessage" class="flex items-center">
             <textarea placeholder="New message" class="w-full px-3 py-2 border" name="message" rows=1
-                v-model="message"></textarea>
+                v-model="message" @keydown.enter.exact="createNewMessage"></textarea>
 
             <input type="submit" class="bg-indigo-400 text-white px-4 py-2 ml-4 h-auto">
         </form>

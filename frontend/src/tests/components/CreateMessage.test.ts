@@ -13,6 +13,10 @@ describe('CreateMessage component', () => {
 	let wrapper: CreateMessageWrapper
 	let channel: Channel
 
+	function messageBodyInput() {
+		return wrapper.find('textarea')
+	}
+
 	beforeEach(() => {
 		channel = { id: "1", name: "Channel name" }
 		wrapper = mount(CreateMessage, {
@@ -20,6 +24,21 @@ describe('CreateMessage component', () => {
 				channel
 			}
 		})
+	})
+
+	it("pressing enter in text area submits the new message", async () => {
+		expect(createMessage).not.toHaveBeenCalled()
+		messageBodyInput().trigger("keydown.enter")
+		expect(createMessage).toHaveBeenCalled()
+	})
+
+	it("pressing shift+enter in text area does not submit the new message", async () => {
+		expect(createMessage).not.toHaveBeenCalled()
+		messageBodyInput().trigger("keydown", {
+			key: 'Enter',
+			shiftKey: true
+		})
+		expect(createMessage).not.toHaveBeenCalled()
 	})
 
 	describe("submitting the form", () => {
@@ -31,10 +50,6 @@ describe('CreateMessage component', () => {
 
 		function formElement() {
 			return wrapper.find('form')
-		}
-
-		function messageBodyInput() {
-			return wrapper.find('textarea')
 		}
 
 		function errorMessageElement() {

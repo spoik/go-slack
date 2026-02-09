@@ -2,26 +2,60 @@
 
 import { nextTick } from 'vue'
 import { describe, it, expect, vi } from 'vitest'
-import { mount, shallowMount, VueWrapper } from '@vue/test-utils'
+import { mount, shallowMount, VueWrapper, flushPromises } from '@vue/test-utils'
+import { createRouter, createMemoryHistory, type Router } from 'vue-router'
+
+import { routes } from '@/routes'
 import { getChannels, type Channel } from '@/utils/channel-service'
 import ChannelList from '@/components/ChannelList.vue'
 import CreateChannel from '@/components/CreateChannel.vue'
 
+type WrappedChannelList = VueWrapper<InstanceType<typeof ChannelList>>
+
 vi.mock('@/utils/channel-service')
 
 describe('ChannelList component', () => {
+	let router: Router
+
+	beforeEach(() => {
+		router = createRouter({
+			history: createMemoryHistory(),
+			routes
+		})
+	})
+
 	function mockGetChannels(channels: Channel[]) {
 		vi.mocked(getChannels).mockResolvedValue(channels)
+	}
+
+	async function initWrapper(route: string = "/", selectedChannel: Channel | null = null): Promise<WrappedChannelList> {
+		var props = { selectedChannel: undefined as Channel | undefined }
+
+		if (selectedChannel != null) {
+			props.selectedChannel = selectedChannel
+		}
+
+		router.push(route)
+		await router.isReady()
+
+		return mount(
+			ChannelList,
+			{
+				props,
+				global: {
+					plugins: [router]
+				}
+			}
+		)
 	}
 
 	it('shows a loading message while the channels are loading', async () => {
 		mockGetChannels([{ id: "1", name: "test" }])
 
-		const wrapper = mount(ChannelList)
+		const wrapper = await initWrapper()
 
 		expect(wrapper.find('[data-test="loading"]').exists()).toBe(true)
 
-		await nextTick()
 		await nextTick()
 
 		expect(wrapper.find('[data-test="loading"]').exists()).toBe(false)
@@ -35,8 +69,7 @@ describe('ChannelList component', () => {
 			{ id: '3', name: 'other' },
 		])
 
-		const wrapper = mount(ChannelList)
-		await nextTick()
+		const wrapper = await initWrapper()
 		await nextTick()
 
 		expect(wrapper.findAll('li')).toHaveLength(3)
@@ -45,33 +78,31 @@ describe('ChannelList component', () => {
 	it('shows an error if the channels failed to load', async () => {
 		vi.mocked(getChannels).mockRejectedValue(new Error("error"))
 
-		const wrapper = mount(ChannelList)
+		const wrapper = await initWrapper()
 		expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
 
-		await nextTick()
 		await nextTick()
 
 		expect(wrapper.find('[data-test="error"]').exists()).toBe(true)
 		expect(wrapper.find('[data-test="error"]').text()).toEqual('Failed to load channels. Please reload to try again.')
 	})
 
-	it('emits channelSelected event with channel the when a channel is clicked', async () => {
-		const testChannels = [
+	it('changes the browser URL to the page for a specific channel when a channel is clicked', async () => {
+		const testChannels: Channel[] = [
 			{ id: '1', name: 'general' },
 			{ id: '2', name: 'temp' },
 		]
 		mockGetChannels(testChannels)
 
-		const wrapper = mount(ChannelList)
-		await nextTick()
-		await nextTick()
+		const wrapper = await initWrapper()
+		await flushPromises()
 
-		wrapper.findAll('[data-test="channel"]')[0]?.trigger('click')
+		expect(router.currentRoute.value.path).toEqual("/")
 
-		expect(wrapper.emitted('channelSelected')).toBeTruthy()
+		await wrapper.findAll('a[data-test="channel"]')[0]?.trigger('click')
+		await flushPromises()
 
-		const emittedChannel = wrapper.emitted('channelSelected')?.[0]?.[0]
-		expect(emittedChannel).toEqual(testChannels[0])
+		expect(router.currentRoute.value.path).toEqual(`/channels/${testChannels[0]?.id}`)
 	})
 
 	it('shows no active channel when selectedChannel prop is empty', async () => {
@@ -81,13 +112,7 @@ describe('ChannelList component', () => {
 		]
 		mockGetChannels(channels)
 
-		const wrapper = mount(ChannelList, {
-			props: {
-				selectedChannel: undefined
-			}
-		})
-		await nextTick()
-		await nextTick()
+		const wrapper = await initWrapper("/", undefined)
 
 		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(0)
 	})
@@ -99,16 +124,34 @@ describe('ChannelList component', () => {
 		]
 		mockGetChannels(channels)
 
-		const wrapper = mount(ChannelList, {
-			props: {
-				selectedChannel: channels[0]
-			}
-		})
-		await nextTick()
+		const wrapper = await initWrapper("/", channels[0])
 		await nextTick()
 
 		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(1)
 		expect(wrapper.get('[data-test="channel"].active').text()).toEqual(channels[0]?.name)
+	})
+
+	it('emits a channelSelected event when the url is for a specific channel', async () => {
+		const channels: Channel[] = [
+			{ id: '1', name: 'general' },
+			{ id: '2', name: 'temp' },
+		]
+		mockGetChannels(channels)
+
+		router.push(`/channels/${channels[0]?.id}`)
+		await router.isReady()
+
+		const wrapper = await initWrapper()
+		await nextTick()
+
+		expect(wrapper.emitted('channelSelected')).toBeTruthy()
+		expect(wrapper.emitted('channelSelected')?.[0]?.[0]).toEqual(channels[0])
+
+		router.push(`/channels/${channels[1]?.id}`)
+		await flushPromises()
+
+		expect(wrapper.emitted('channelSelected')?.length).toEqual(2)
+		expect(wrapper.emitted('channelSelected')?.[1]?.[0]).toEqual(channels[1])
 	})
 
 	describe('when the CreateChannel component emits a newly created channel', () => {
@@ -122,7 +165,11 @@ describe('ChannelList component', () => {
 			]
 			mockGetChannels(structuredClone(existingChannels))
 
-			wrapper = shallowMount(ChannelList)
+			wrapper = mount(ChannelList, {
+				global: {
+					plugins: [router]
+				}
+			})
 
 			await nextTick()
 		})

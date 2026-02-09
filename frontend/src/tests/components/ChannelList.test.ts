@@ -140,11 +140,18 @@ describe('ChannelList component', () => {
 
 		router.push(`/channels/${channels[0]?.id}`)
 		await router.isReady()
+
 		const wrapper = await initWrapper()
 		await nextTick()
 
 		expect(wrapper.emitted('channelSelected')).toBeTruthy()
 		expect(wrapper.emitted('channelSelected')?.[0]?.[0]).toEqual(channels[0])
+
+		router.push(`/channels/${channels[1]?.id}`)
+		await flushPromises()
+
+		expect(wrapper.emitted('channelSelected')?.length).toEqual(2)
+		expect(wrapper.emitted('channelSelected')?.[1]?.[0]).toEqual(channels[1])
 	})
 
 	describe('when the CreateChannel component emits a newly created channel', () => {

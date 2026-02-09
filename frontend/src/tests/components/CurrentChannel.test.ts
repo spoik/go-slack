@@ -11,7 +11,7 @@ import CreateMessage from '@/components/CreateMessage.vue'
 type CurrentChannelWrapper = VueWrapper<InstanceType<typeof CurrentChannel>>
 
 describe('CurrentChannel component', () => {
-    let getMessagesMocked: Mock<(channelId: string) => Promise<Message[]>>
+   let getMessagesMocked: Mock<(channelId: string) => Promise<Message[]>>
 
     beforeEach(() => {
         getMessagesMocked = vi.spyOn(channelService, 'getMessages')
@@ -146,7 +146,7 @@ describe('CurrentChannel component', () => {
         describe('when the CreateMessage component emits a newly created message', () => {
             let wrapper: CurrentChannelWrapper
 
-            async function emitNewMesasge(): Message {
+            async function emitNewMesasge():Promise<Message> {
                 const newMessage = new Message("3", "Test 3", new Date())
                 wrapper.findComponent(CreateMessage).vm.$emit('messageCreated', newMessage)
 

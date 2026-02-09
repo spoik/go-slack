@@ -28,14 +28,14 @@ describe('ChannelList component', () => {
 		vi.mocked(getChannels).mockResolvedValue(channels)
 	}
 
-	async function initWrapper(selectedChannel: Channel | null = null): Promise<WrappedChannelList> {
+	async function initWrapper(route: string = "/", selectedChannel: Channel | null = null): Promise<WrappedChannelList> {
 		var props = { selectedChannel: undefined as Channel | undefined }
 
 		if (selectedChannel != null) {
 			props.selectedChannel = selectedChannel
 		}
 
-		router.push('/')
+		router.push(route)
 		await router.isReady()
 
 		return mount(
@@ -112,7 +112,7 @@ describe('ChannelList component', () => {
 		]
 		mockGetChannels(channels)
 
-		const wrapper = await initWrapper(undefined)
+		const wrapper = await initWrapper("/", undefined)
 
 		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(0)
 	})
@@ -124,11 +124,27 @@ describe('ChannelList component', () => {
 		]
 		mockGetChannels(channels)
 
-		const wrapper = await initWrapper(channels[0])
+		const wrapper = await initWrapper("/", channels[0])
 		await nextTick()
 
 		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(1)
 		expect(wrapper.get('[data-test="channel"].active').text()).toEqual(channels[0]?.name)
+	})
+
+	it('emits a channelSelected event when the url is for a specific channel', async () => {
+		const channels: Channel[] = [
+			{ id: '1', name: 'general' },
+			{ id: '2', name: 'temp' },
+		]
+		mockGetChannels(channels)
+
+		router.push(`/channels/${channels[0]?.id}`)
+		await router.isReady()
+		const wrapper = await initWrapper()
+		await nextTick()
+
+		expect(wrapper.emitted('channelSelected')).toBeTruthy()
+		expect(wrapper.emitted('channelSelected')?.[0]?.[0]).toEqual(channels[0])
 	})
 
 	describe('when the CreateChannel component emits a newly created channel', () => {

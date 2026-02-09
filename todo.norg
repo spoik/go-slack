@@ -5,6 +5,11 @@
 -- (x) Submit form when enter is pressed but now when enter and a modifier is pressed.
 -- (x) Updated CurrentChannel component to show new messages emitted by the CreateMessage component.
 
+- ( ) Run tests on every commit through Github actions.
+
+- ( ) Create a "production" environment. Acorn? Heroku? Other?
+-- ( ) Leverage Kubernetes?
+
 - ( ) Browser Address bar navigation
 -- ( ) Update browser address when a channel is chosen.
 -- ( ) Automatically select a channel when the address bar contains a specific channel.

@@ -33,6 +33,8 @@ db-migration: ## Create a new database migration in the development environment
 	$(DOCKER_DEV) exec app-dev migrate create -ext sql -dir migrations $(name)
 sqlc-generate: ## Generate sqlc files
 	$(DOCKER_DEV) exec app-dev go tool sqlc generate
+ts-type-check:
+	$(DOCKER_DEV) run frontend npm run type-check
 
 # --- Testing environment ---
 test-up:
@@ -43,7 +45,7 @@ test-app: db-up-test
 	$(DOCKER_TEST) exec -T app-test go test -count=1 ./...
 test-frontend:
 	$(DOCKER_TEST) exec -T frontend-test npm run test
-test-all: test-app test-frontend
+test: test-app test-frontend
 db-up-test: ## Run database migrations in the testing environment
 	$(DOCKER_TEST) exec -T app-test sh -c "migrate -path migrations -database \$$DB_URL up"
 db-drop-test: ## Drop database tables in the testing environment

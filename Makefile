@@ -23,7 +23,7 @@ shell:
 	$(DOCKER_DEV) exec app-dev sh
 db-shell:
 	@export $$(cat .env.dev | xargs) && $(DOCKER_DEV) exec -it db psql -U $$DB_USER -d $$DB_NAME
-db-up-dev: # Run database migrations
+db-up-dev: ## Run database migrations
 	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL up"
 db-down-dev: ## Rollback one database migration in the development environment
 	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL down 1"

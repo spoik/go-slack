@@ -1,11 +1,22 @@
 services:
+  traefik:
+    image: traefik:v3.6.10
+    command:
+      - "--api.insecure=true" # Dashboard at :8080 (Remove in production!)
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Dashboard port
+    volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   app-dev:
     build:
       context: ./backend
       target: dev
     user: "${UID}:${GID}"
-    ports:
-      - "8000:8000"
     environment:
       DB_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
       GOCACHE: /tmp/.cache
@@ -14,13 +25,29 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      # Routes all traffic starting with /api to this container
+      - "traefik.http.routers.app.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      # Define a middleware to strip the "/api" prefix before sending to Go
+      - "traefik.http.middlewares.api-strip.stripprefix.prefixes=/api"
+      # Apply that middleware to this router
+      - "traefik.http.routers.app.middlewares=api-strip"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.services.app.loadbalancer.server.port=8000"
 
   frontend:
     build:
       context: ./frontend
       target: dev
+    environment:
+      - VITE_API_URL=http://localhost/api
     user: "${UID}:${GID}"
-    ports:
-      - "5173:5173"
     volumes:
       - ./frontend/:/app
+    labels:
+      - "traefik.enable=true"
+      # Routes everything else to the Vite frontend
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"

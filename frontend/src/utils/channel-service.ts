@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import axios from 'axios'
 import { plainToInstance, Type } from 'class-transformer'
 
-const host = 'http://localhost:8000'
+const host = import.meta.env.VITE_API_URL
 
 export interface Channel {
 	readonly id: string;

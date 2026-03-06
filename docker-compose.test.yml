@@ -23,6 +23,8 @@ services:
     build:
       context: ./frontend
       target: test
+    environment:
+      - VITE_API_URL=http://localhost/api
     volumes:
       - ./frontend/:/app
       - /app/node_modules

@@ -20,19 +20,19 @@ dev-up: ## Start development docker environment
 dev-down: ## Stop development docker environment
 	$(DOCKER_DEV) down
 shell:
-	$(DOCKER_DEV) exec app-dev sh
+	$(DOCKER_DEV) exec app sh
 db-shell:
 	@export $$(cat .env.dev | xargs) && $(DOCKER_DEV) exec -it db psql -U $$DB_USER -d $$DB_NAME
 db-up-dev: ## Run database migrations
-	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL up"
+	$(DOCKER_DEV) exec app sh -c "migrate -path migrations -database \$$DB_URL up"
 db-down-dev: ## Rollback one database migration in the development environment
-	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL down 1"
+	$(DOCKER_DEV) exec app sh -c "migrate -path migrations -database \$$DB_URL down 1"
 db-drop-dev: ## Drop database tables in development environment
-	$(DOCKER_DEV) exec app-dev sh -c "migrate -path migrations -database \$$DB_URL drop"
+	$(DOCKER_DEV) exec app sh -c "migrate -path migrations -database \$$DB_URL drop"
 db-migration: ## Create a new database migration in the development environment
-	$(DOCKER_DEV) exec app-dev migrate create -ext sql -dir migrations $(name)
+	$(DOCKER_DEV) exec app migrate create -ext sql -dir migrations $(name)
 sqlc-generate: ## Generate sqlc files
-	$(DOCKER_DEV) exec app-dev go tool sqlc generate
+	$(DOCKER_DEV) exec app go tool sqlc generate
 ts-type-check:
 	$(DOCKER_DEV) run frontend npm run type-check
 
@@ -42,13 +42,13 @@ test-up:
 test-down:
 	$(DOCKER_TEST) down
 test-app: db-up-test
-	$(DOCKER_TEST) exec -T app-test go test -count=1 ./...
+	$(DOCKER_TEST) exec -T app go test -count=1 ./...
 test-frontend:
-	$(DOCKER_TEST) exec -T frontend-test npm run test
+	$(DOCKER_TEST) exec -T frontend npm run test
 test: test-app test-frontend
 db-up-test: ## Run database migrations in the testing environment
-	$(DOCKER_TEST) exec -T app-test sh -c "migrate -path migrations -database \$$DB_URL up"
+	$(DOCKER_TEST) exec -T app sh -c "migrate -path migrations -database \$$DB_URL up"
 db-drop-test: ## Drop database tables in the testing environment
-	$(DOCKER_TEST) exec app-test sh -c "migrate -path migrations -database \$$DB_URL drop"
+	$(DOCKER_TEST) exec app sh -c "migrate -path migrations -database \$$DB_URL drop"
 db-shell-test:
 	@export $$(cat .env.test | xargs) && $(DOCKER_TEST) exec -it db psql -U $$DB_USER -d $$DB_NAME

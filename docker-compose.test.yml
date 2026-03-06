@@ -5,7 +5,7 @@ services:
       timeout: 1s
       retries: 1
 
-  app-test:
+  app:
     build:
       context: ./backend
       target: test
@@ -19,7 +19,7 @@ services:
       db:
         condition: service_healthy
 
-  frontend-test:
+  frontend:
     build:
       context: ./frontend
       target: test

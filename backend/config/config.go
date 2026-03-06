@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	DB_URL string `env:"DB_URL"`
-	Port   int    `env:"PORT" envDefault:"8000"`
+	Port   int    `env:"PORT" envDefault:"8100"`
 }
 
 func New() (*Config, error) {

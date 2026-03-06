@@ -5,9 +5,9 @@ services:
       - "--api.insecure=true" # Dashboard at :8080 (Remove in production!)
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.address=:8000"
     ports:
-      - "80:80"
+      - "8000:8000"
       - "8080:8080" # Dashboard port
     volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -34,14 +34,14 @@ services:
       # Apply that middleware to this router
       - "traefik.http.routers.app.middlewares=api-strip"
       - "traefik.http.routers.app.entrypoints=web"
-      - "traefik.http.services.app.loadbalancer.server.port=8000"
+      - "traefik.http.services.app.loadbalancer.server.port=8100"
 
   frontend:
     build:
       context: ./frontend
       target: dev
     environment:
-      - VITE_API_URL=http://localhost/api
+      - VITE_API_URL=http://localhost:8000/api
     user: "${UID}:${GID}"
     volumes:
       - ./frontend/:/app

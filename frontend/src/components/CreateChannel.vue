@@ -22,8 +22,6 @@ watch(showForm, async (newValue) => {
 })
 
 async function createNewChannel() {
-    errorMessage.value = null
-
     if (newChannelName.value.trim() == "") {
         errorMessage.value = "Please enter a channel name."
         return
@@ -33,6 +31,7 @@ async function createNewChannel() {
 
     try {
         newChannel = await createChannel(newChannelName.value)
+        errorMessage.value = null
     } catch (error: any) {
         if (error instanceof AxiosError && error.response != undefined) {
             errorMessage.value = error.response.data
@@ -58,13 +57,12 @@ async function createNewChannel() {
 
         <form v-else @submit.prevent="createNewChannel" class="mt-4" data-test="form">
             <p v-if="errorMessage != null" class="text-red-400 mb-1.5" data-test="create channel error">{{ errorMessage
-            }}</p>
+                }}</p>
 
             <label for="name" class="sr-only">New Channel Name</label>
             <input type="text" name="name" placeholder="New channel name" v-model="newChannelName"
-                @keydown.esc="showForm = false"
-                ref="nameInput"
-                class="w-full border py-1.5 px-3 rounded-sm" data-test="channel name input" />
+                @keydown.esc="showForm = false" ref="nameInput" class="w-full border py-1.5 px-3 rounded-sm"
+                data-test="channel name input" />
 
             <div class="flex gap-4 mt-3">
                 <button type="button" @click="showForm = false"

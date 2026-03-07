@@ -16,7 +16,7 @@ describe('channel-service', () => {
 
       const channels = await getChannels()
 
-      expect(axios.get).toHaveBeenCalledWith('http://localhost/api/channels')
+      expect(axios.get).toHaveBeenCalledWith('http://localhost:8000/api/channels')
       expect(channels).toEqual(mockChannels)
     })
   })
@@ -30,7 +30,7 @@ describe('channel-service', () => {
       const returnedChannel = await createChannel(channelName)
 
       const expectedData = { name: channelName }
-      expect(axios.post).toHaveBeenCalledWith('http://localhost/api/channels', expectedData)
+      expect(axios.post).toHaveBeenCalledWith('http://localhost:8000/api/channels', expectedData)
 
       expect(returnedChannel.id).toEqual(mockChannel.id)
       expect(returnedChannel.name).toEqual(mockChannel.name)
@@ -49,7 +49,7 @@ describe('channel-service', () => {
 
       const messages = await getMessages(channelId)
 
-      expect(axios.get).toHaveBeenCalledWith(`http://localhost/api/channels/${channelId}/messages`)
+      expect(axios.get).toHaveBeenCalledWith(`http://localhost:8000/api/channels/${channelId}/messages`)
       expect(messages).toEqual(mockMessages)
     })
   })
@@ -64,7 +64,7 @@ describe('channel-service', () => {
       const returnedMessage = await createMessage(channelId, message)
 
       expect(axios.post).toHaveBeenCalledWith(
-        'http://localhost/api/channels/2/messages',
+        'http://localhost:8000/api/channels/2/messages',
         { message }
       )
 

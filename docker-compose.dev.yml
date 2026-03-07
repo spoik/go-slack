@@ -14,17 +14,8 @@ services:
 
   app:
     build:
-      context: ./backend
       target: dev
     user: "${UID}:${GID}"
-    environment:
-      DB_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
-      GOCACHE: /tmp/.cache
-    volumes:
-      - ./backend/:/app
-    depends_on:
-      db:
-        condition: service_healthy
     labels:
       - "traefik.enable=true"
       # Routes all traffic starting with /api to this container
@@ -38,13 +29,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
       target: dev
-    environment:
-      - VITE_API_URL=http://localhost:8000/api
     user: "${UID}:${GID}"
-    volumes:
-      - ./frontend/:/app
     labels:
       - "traefik.enable=true"
       # Routes everything else to the Vite frontend

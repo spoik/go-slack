@@ -84,6 +84,40 @@ describe('CreateChannel component', () => {
 		expect(createChannelButton(wrapper).exists()).toBe(true)
 	})
 
+	it('clears the channel name input when the create channel form is hidden', async () => {
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+
+		channelNameInput(wrapper).setValue('Some text')
+		expect(channelNameInput(wrapper).element.value).toBe('Some text')
+
+		// Hide the form
+		wrapper.get('[data-test="cancel"]').trigger('click')
+		await nextTick()
+
+		// Show it again and verify input is cleared
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+		expect(channelNameInput(wrapper).element.value).toBe('')
+	})
+
+	it('clears the channel name input when the Escape key is pressed', async () => {
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+
+		channelNameInput(wrapper).setValue('Some text')
+		expect(channelNameInput(wrapper).element.value).toBe('Some text')
+
+		// Press Escape
+		channelNameInput(wrapper).trigger('keydown.esc')
+		await nextTick()
+
+		// Show it again and verify input is cleared
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+		expect(channelNameInput(wrapper).element.value).toBe('')
+	})
+
 	it('clears the error message when the create channel form is hidden', async () => {
 		createChannelButton(wrapper).trigger('click')
 		await nextTick()

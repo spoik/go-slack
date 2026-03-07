@@ -18,6 +18,7 @@ watch(showForm, async (newValue) => {
         nameInput.value?.focus()
     } else {
         errorMessage.value = null
+        newChannelName.value = ''
     }
 })
 

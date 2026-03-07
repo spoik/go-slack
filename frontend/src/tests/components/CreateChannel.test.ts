@@ -216,7 +216,8 @@ describe('CreateChannel component', () => {
 				createChannelButton(wrapper).trigger('click')
 				await nextTick()
 
-				expect(channelNameInput(wrapper).element.value).toBe('')
+				const input = channelNameInput(wrapper).element as HTMLInputElement
+				expect(input.value).toBe('')
 			})
 
 			it('emits the newly created channel', async () => {

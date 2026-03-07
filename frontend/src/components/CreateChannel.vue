@@ -52,6 +52,7 @@ async function createNewChannel() {
 
             <label for="name" class="sr-only">New Channel Name</label>
             <input type="text" name="name" placeholder="New channel name" v-model="newChannelName"
+                @keydown.esc="showForm = false"
                 class="w-full border py-1.5 px-3 rounded-sm" data-test="channel name input" />
 
             <div class="flex gap-4 mt-3">

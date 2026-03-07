@@ -57,6 +57,18 @@ describe('CreateChannel component', () => {
 		expect(createChannelButton(wrapper).exists()).toBe(true)
 	})
 
+	it('hides the create channel form when the Escape key is pressed in the channel name input', async () => {
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+		expect(formElement(wrapper).exists()).toBe(true)
+
+		channelNameInput(wrapper).trigger('keydown.esc')
+		await nextTick()
+
+		expect(formElement(wrapper).exists()).toBe(false)
+		expect(createChannelButton(wrapper).exists()).toBe(true)
+	})
+
 	describe('submitting the form', () => {
 		beforeEach(async () => {
 			createChannelButton(wrapper).trigger('click')

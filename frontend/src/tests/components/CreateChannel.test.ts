@@ -45,6 +45,18 @@ describe('CreateChannel component', () => {
 		expect(createChannelButton(wrapper).exists()).toBe(false)
 	})
 
+	it('hides the create channel form when cancel button is clicked', async () => {
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+		expect(formElement(wrapper).exists()).toBe(true)
+
+		wrapper.get('[data-test="cancel"]').trigger('click')
+		await nextTick()
+
+		expect(formElement(wrapper).exists()).toBe(false)
+		expect(createChannelButton(wrapper).exists()).toBe(true)
+	})
+
 	describe('submitting the form', () => {
 		beforeEach(async () => {
 			createChannelButton(wrapper).trigger('click')

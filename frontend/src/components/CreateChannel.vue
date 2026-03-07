@@ -55,7 +55,8 @@ async function createNewChannel() {
                 class="w-full border py-1.5 px-3 rounded-sm" data-test="channel name input" />
 
             <div class="flex gap-4 mt-3">
-                <button class="px-4 py-1 bg-red-400 grow text-gray-100 rounded-xs">Cancel</button>
+                <button type="button" @click="showForm = false"
+                    class="px-4 py-1 bg-red-400 grow text-gray-100 rounded-xs" data-test="cancel">Cancel</button>
                 <input type="submit" class="bg-indigo-400 px-4 py-1 grow rounded-xs" data-test="submit"
                     value="Create" />
             </div>

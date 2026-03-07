@@ -34,17 +34,17 @@ onMounted(loadMessages)
 </script>
 
 <template>
-    <div class="p-5">
+    <div class="h-screen flex flex-col">
         <p v-if="channel == null" data-test="channel empty message">Please select a channel.</p>
 
-        <div v-else class="h-full flex flex-col">
-            <div class="grow">
+        <template v-else>
+            <div class="min-h-0 overflow-y-auto flex-1 p-5">
                 <p v-if="error != undefined" data-test="error">{{ error }}</p>
 
                 <p v-else-if="!hasMessages" data-test="messages empty message">No messages in this channel yet.</p>
 
-                <ul dv-else data-test="messages">
-                    <li v-for="message in messages" :key="message.id" :data-test-message="message.id" class="mb-5 flex">
+                <ul dv-else class="flex flex-col gap-5" data-test="messages">
+                    <li v-for="message in messages" :key="message.id" :data-test-message="message.id" class="flex">
                         <p class="grow" data-test="message text">{{ message.message }}</p>
 
                         <time data-test="datetime" class="text-gray-400" :datetime="message.created_at.toISOString()">
@@ -54,10 +54,9 @@ onMounted(loadMessages)
                 </ul>
             </div>
 
-            <div v-if="error == undefined" class="mt-4">
-                <hr>
-                <CreateMessage class="mt-4" :channel="channel" @message-created="newMessageCreated" />
+            <div v-if="error == undefined" class="p-5 border-t border-zinc-700">
+                <CreateMessage :channel="channel" @message-created="newMessageCreated" />
             </div>
-        </div>
+        </template>
     </div>
 </template>

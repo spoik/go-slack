@@ -30,10 +30,11 @@ async function createNewMessage() {
 <template>
     <div>
         <form @submit.prevent="createNewMessage" class="flex items-center">
-            <textarea placeholder="New message" class="w-full px-3 py-2 border" name="message" rows=1
-                v-model="message" @keydown.enter.exact="createNewMessage"></textarea>
+            <textarea placeholder="New message"
+                class="w-full px-3 py-2 bg-zinc-700 rounded-sm min-h-10.5 focus:border-slate-500 focus:ring-slate-500 focus:ring-1 outline-none"
+                name="message" rows=1 v-model="message" @keydown.enter.exact="createNewMessage"></textarea>
 
-            <input type="submit" class="bg-indigo-400 text-white px-4 py-2 ml-4 h-auto">
+            <input type="submit" class="bg-indigo-400 text-white px-4 py-2 ml-4 h-auto rounded-xs" value="Submit">
         </form>
 
         <p v-if="errorMessage != null" class="mt-2 text-red-400" data-error>{{ errorMessage }}</p>

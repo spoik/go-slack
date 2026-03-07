@@ -16,6 +16,8 @@ watch(showForm, async (newValue) => {
     if (newValue) {
         await nextTick()
         nameInput.value?.focus()
+    } else {
+        errorMessage.value = null
     }
 })
 

@@ -4,6 +4,7 @@ import CreateChannel from '@/components/CreateChannel.vue'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { AxiosError, AxiosHeaders } from 'axios'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { createChannel, type Channel } from '@/utils/channel-service'
 
@@ -15,7 +16,13 @@ describe('CreateChannel component', () => {
 	let wrapper: CreateChannelWrapper
 
 	beforeEach(() => {
-		wrapper = mount(CreateChannel)
+		wrapper = mount(CreateChannel, {
+			attachTo: document.body
+		})
+	})
+
+	afterEach(() => {
+		wrapper.unmount()
 	})
 
 	function formElement(wrapper: CreateChannelWrapper) {
@@ -43,6 +50,14 @@ describe('CreateChannel component', () => {
 
 		expect(formElement(wrapper).exists()).toBe(true)
 		expect(createChannelButton(wrapper).exists()).toBe(false)
+	})
+
+	it('focuses the channel name input when the create channel form is shown', async () => {
+		createChannelButton(wrapper).trigger('click')
+		await nextTick()
+		await nextTick() // watcher + nextTick inside
+
+		expect(channelNameInput(wrapper).element).toBe(document.activeElement)
 	})
 
 	it('hides the create channel form when cancel button is clicked', async () => {

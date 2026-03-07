@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import { createChannel, type Channel } from "@/utils/channel-service"
 import { AxiosError } from "axios";
 
@@ -10,6 +10,14 @@ const emit = defineEmits<{
 const showForm = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const newChannelName = ref<string>('')
+const nameInput = ref<HTMLInputElement | null>(null)
+
+watch(showForm, async (newValue) => {
+    if (newValue) {
+        await nextTick()
+        nameInput.value?.focus()
+    }
+})
 
 async function createNewChannel() {
     errorMessage.value = null
@@ -53,6 +61,7 @@ async function createNewChannel() {
             <label for="name" class="sr-only">New Channel Name</label>
             <input type="text" name="name" placeholder="New channel name" v-model="newChannelName"
                 @keydown.esc="showForm = false"
+                ref="nameInput"
                 class="w-full border py-1.5 px-3 rounded-sm" data-test="channel name input" />
 
             <div class="flex gap-4 mt-3">

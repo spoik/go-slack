@@ -64,22 +64,33 @@ function channelCreated(channel: Channel) {
     channels.value.push(channel)
 }
 
+function linkAttrs(channel: Channel): object {
+    if (channel.id == selectedChannel.value?.id) {
+        return {
+            class: "bg-zinc-700!",
+            "data-test-active": ""
+        }
+    }
+
+    return {}
+}
+
 onMounted(loadChannels)
 </script>
 
 <template>
-    <div class="p-5 border w-1/6">
-        <h2 class="mb-1">Channels</h2>
-        <hr class="mb-3">
+    <div class="p-5 bg-zinc-900">
+        <h2 class="mb-3.5 text-xl">Channels</h2>
 
         <p v-if="loading" data-test="loading">Loading...</p>
         <p v-if="loadChannelsError != null" data-test="error">{{ loadChannelsError }}</p>
 
         <div v-if="!loading">
             <ul v-if="channels?.length">
-                <li v-for="channel in channels" :key="channel.id">
+                <li v-for="channel in channels" :key="channel.id" class="mt-1.5">
                     <RouterLink :to="{ name: 'channel', params: { id: channel.id } }" data-test="channel"
-                        class="channel-title" :class="{ 'active': channel.id == selectedChannel?.id }">
+                        class="py-2 px-3 block rounded-sm channel-title hover:bg-zinc-800"
+                        v-bind="linkAttrs(channel)">
                         {{ channel.name }}
                     </RouterLink>
                 </li>
@@ -89,19 +100,3 @@ onMounted(loadChannels)
         </div>
     </div>
 </template>
-
-<style scoped>
-@reference "tailwindcss";
-
-.channel-title {
-    @apply p-2 block;
-}
-
-.channel-title:hover {
-    @apply bg-gray-100;
-}
-
-.channel-title.active {
-    @apply bg-gray-300;
-}
-</style>

@@ -114,7 +114,7 @@ describe('ChannelList component', () => {
 
 		const wrapper = await initWrapper("/", undefined)
 
-		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(0)
+		expect(wrapper.findAll('[data-test="channel"][data-test-active]').length).toBe(0)
 	})
 
 	it('shows an active channel when selectedChannel prop is provided', async () => {
@@ -127,8 +127,8 @@ describe('ChannelList component', () => {
 		const wrapper = await initWrapper("/", channels[0])
 		await nextTick()
 
-		expect(wrapper.findAll('[data-test="channel"].active').length).toBe(1)
-		expect(wrapper.get('[data-test="channel"].active').text()).toEqual(channels[0]?.name)
+		expect(wrapper.findAll('[data-test="channel"][data-test-active]').length).toBe(1)
+		expect(wrapper.get('[data-test="channel"][data-test-active]').text()).toEqual(channels[0]?.name)
 	})
 
 	it('emits a channelSelected event when the url is for a specific channel', async () => {

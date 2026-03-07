@@ -34,7 +34,7 @@ onMounted(loadMessages)
 </script>
 
 <template>
-    <div class="p-5 border">
+    <div class="p-5">
         <p v-if="channel == null" data-test="channel empty message">Please select a channel.</p>
 
         <div v-else class="h-full flex flex-col">

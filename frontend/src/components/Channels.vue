@@ -13,8 +13,8 @@ function channelSelected(channel: Channel) {
 </script>
 
 <template>
-    <div class="min-h-screen flex gap-10 p-5 lg:p-8">
-        <ChannelList id="channel-list" @channel-selected="channelSelected" :selected-channel="currentChannel" />
-        <CurrentChannel id="current-channel" class="grow" :channel="currentChannel" />
+    <div class="min-h-screen flex bg-zinc-800 text-zinc-200">
+        <ChannelList id="channel-list" class="w-1/6" @channel-selected="channelSelected" :selected-channel="currentChannel" />
+        <CurrentChannel id="current-channel" class="w-5/6" :channel="currentChannel" />
     </div>
 </template>

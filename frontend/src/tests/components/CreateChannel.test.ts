@@ -209,6 +209,16 @@ describe('CreateChannel component', () => {
 				expect(createChannelButton(wrapper).exists()).toBe(true)
 			})
 
+			it('clears the channel name input', async () => {
+				await submitNewChannel(newChannel.name)
+
+				// Show the form again to check the input value
+				createChannelButton(wrapper).trigger('click')
+				await nextTick()
+
+				expect(channelNameInput(wrapper).element.value).toBe('')
+			})
+
 			it('emits the newly created channel', async () => {
 				expect(wrapper.emitted('channelSelected')).toBeFalsy()
 

@@ -43,6 +43,7 @@ async function createNewChannel() {
     }
 
     showForm.value = false
+    newChannelName.value = ''
 
     emit('channelCreated', newChannel)
 }

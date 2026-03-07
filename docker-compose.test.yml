@@ -8,7 +8,6 @@ services:
   app:
     build:
       target: test
-    command: tail -f /dev/null
 
   frontend:
     build:

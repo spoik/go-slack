@@ -40,16 +40,26 @@ async function createNewChannel() {
 </script>
 
 <template>
-    <button v-if="!showForm" @click="showForm = true" data-test="create channel button">+
-        create channel</button>
+    <div class="mt-2.5">
+        <button v-if="!showForm" @click="showForm = true" class="hover:cursor-pointer"
+            data-test="create channel button">
+            + create channel
+        </button>
 
-    <form v-else @submit.prevent="createNewChannel" class="flex flex-row gap-4" data-test="form">
-        <label for="name" class="sr-only">New Channel Name</label>
-        <input type="text" name="name" placeholder="New channel name" v-model="newChannelName"
-            class="grow min-w-0 border p-1" data-test="channel name input" />
-        <input type="submit" class="bg-indigo-400 px-4" data-test="submit" />
-    </form>
+        <form v-else @submit.prevent="createNewChannel" class="mt-4" data-test="form">
+            <p v-if="errorMessage != null" class="text-red-400 mb-1.5" data-test="create channel error">{{ errorMessage
+            }}</p>
 
-    <p v-if="errorMessage != null" class="text-red-400" data-test="create channel error">{{ errorMessage
-        }}</p>
+            <label for="name" class="sr-only">New Channel Name</label>
+            <input type="text" name="name" placeholder="New channel name" v-model="newChannelName"
+                class="w-full border py-1.5 px-3 rounded-sm" data-test="channel name input" />
+
+            <div class="flex gap-4 mt-3">
+                <button class="px-4 py-1 bg-red-400 grow text-gray-100 rounded-xs">Cancel</button>
+                <input type="submit" class="bg-indigo-400 px-4 py-1 grow rounded-xs" data-test="submit"
+                    value="Create" />
+            </div>
+        </form>
+
+    </div>
 </template>

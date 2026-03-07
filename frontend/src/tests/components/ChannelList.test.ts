@@ -192,5 +192,22 @@ describe('ChannelList component', () => {
 			expect(channelElements[1]?.text()).toEqual(newChannel.name)
 			expect(channelElements[2]?.text()).toEqual(existingChannels[1]?.name)
 		})
+
+		it('navigates to the new channel after it is created', async () => {
+			const newChannel: Channel = { id: "3", name: "B" }
+			await emitChannelCreated(newChannel);
+			await flushPromises()
+
+			expect(router.currentRoute.value.name).toEqual('channel')
+			expect(router.currentRoute.value.params.id).toEqual(newChannel.id)
+		})
+
+		it('emits a channelSelected event after a new channel is created', async () => {
+			const newChannel: Channel = { id: "3", name: "B" }
+			await emitChannelCreated(newChannel);
+
+			expect(wrapper.emitted('channelSelected')).toBeTruthy()
+			expect(wrapper.emitted('channelSelected')?.some(event => event[0].id === newChannel.id)).toBe(true)
+		})
 	})
 })

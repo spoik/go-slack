@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, toRefs, watch } from "vue"
-import { RouterLink, useRoute } from "vue-router"
+import { RouterLink, useRoute, useRouter } from "vue-router"
 import { getChannels, type Channel } from "@/utils/channel-service"
 import CreateChannel from "./CreateChannel.vue";
 
@@ -9,6 +9,7 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const router = useRouter()
 
 const props = defineProps<{ selectedChannel?: Channel }>()
 const { selectedChannel } = toRefs(props)
@@ -62,6 +63,9 @@ function channelCreated(channel: Channel) {
     }
 
     channels.value.push(channel)
+
+    router.push({ name: 'channel', params: { id: channel.id } })
+    emit('channelSelected', channel)
 }
 
 function linkAttrs(channel: Channel): object {

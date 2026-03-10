@@ -207,7 +207,7 @@ describe('ChannelList component', () => {
 			await emitChannelCreated(newChannel);
 
 			expect(wrapper.emitted('channelSelected')).toBeTruthy()
-			expect(wrapper.emitted('channelSelected')?.some(event => event[0].id === newChannel.id)).toBe(true)
+			expect(wrapper.emitted('channelSelected')?.[0]?.[0]).toEqual(newChannel)
 		})
 	})
 })

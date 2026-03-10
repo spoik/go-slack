@@ -41,6 +41,11 @@ describe('CreateChannel component', () => {
 		return wrapper.get('[data-test="channel name input"]')
 	}
 
+	function channelNameInputValue(wrapper: CreateChannelWrapper): string {
+		const input = wrapper.get('[data-test="channel name input"]').element as HTMLInputElement
+		return input.value
+	}
+
 	it('shows the create channel form when create channel button is clicked', async () => {
 		expect(formElement(wrapper).exists()).toBe(false)
 		expect(createChannelButton(wrapper).exists()).toBe(true)
@@ -89,7 +94,7 @@ describe('CreateChannel component', () => {
 		await nextTick()
 
 		channelNameInput(wrapper).setValue('Some text')
-		expect(channelNameInput(wrapper).element.value).toBe('Some text')
+		expect(channelNameInputValue(wrapper)).toBe('Some text')
 
 		// Hide the form
 		wrapper.get('[data-test="cancel"]').trigger('click')
@@ -98,7 +103,7 @@ describe('CreateChannel component', () => {
 		// Show it again and verify input is cleared
 		createChannelButton(wrapper).trigger('click')
 		await nextTick()
-		expect(channelNameInput(wrapper).element.value).toBe('')
+		expect(channelNameInputValue(wrapper)).toBe('')
 	})
 
 	it('clears the channel name input when the Escape key is pressed', async () => {
@@ -106,7 +111,7 @@ describe('CreateChannel component', () => {
 		await nextTick()
 
 		channelNameInput(wrapper).setValue('Some text')
-		expect(channelNameInput(wrapper).element.value).toBe('Some text')
+		expect(channelNameInputValue(wrapper)).toBe('Some text')
 
 		// Press Escape
 		channelNameInput(wrapper).trigger('keydown.esc')
@@ -115,7 +120,7 @@ describe('CreateChannel component', () => {
 		// Show it again and verify input is cleared
 		createChannelButton(wrapper).trigger('click')
 		await nextTick()
-		expect(channelNameInput(wrapper).element.value).toBe('')
+		expect(channelNameInputValue(wrapper)).toBe('')
 	})
 
 	it('clears the error message when the create channel form is hidden', async () => {

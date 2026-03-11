@@ -57,3 +57,5 @@ db-shell-test:
 # --- Prod environment ---
 prod-up:
 	$(DOCKER_PROD) up --build
+db-up-prod:
+	$(DOCKER_PROD) exec app sh -c "migrate -path migrations -database \$$DB_URL up"

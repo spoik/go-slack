@@ -29,6 +29,8 @@ services:
     build:
       target: dev
     user: "${UID}:${GID}"
+    volumes:
+      - /app/node_modules
     labels:
       - "traefik.enable=true"
       # Routes everything else to the Vite frontend

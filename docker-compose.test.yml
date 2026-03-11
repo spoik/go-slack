@@ -1,10 +1,4 @@
 services:
-  db:
-    healthcheck:
-      interval: 1s
-      timeout: 1s
-      retries: 1
-
   app:
     build:
       target: test

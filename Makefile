@@ -4,6 +4,7 @@ export GID := $(shell id -g)
 
 DOCKER_DEV=docker compose -p go-slack-dev -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev
 DOCKER_TEST=docker compose -p go-slack-test -f docker-compose.yml -f docker-compose.test.yml --env-file .env.test
+DOCKER_PROD=docker compose -p go-slack -f docker-compose.yml -f docker-compose.prod.yml --env-file .env
 
 .PHONY: help
 .DEFAULT_GOAL := help
@@ -52,3 +53,7 @@ db-drop-test: ## Drop database tables in the testing environment
 	$(DOCKER_TEST) exec app sh -c "migrate -path migrations -database \$$DB_URL drop"
 db-shell-test:
 	@export $$(cat .env.test | xargs) && $(DOCKER_TEST) exec -it db psql -U $$DB_USER -d $$DB_NAME
+
+# --- Prod environment ---
+prod-up:
+	$(DOCKER_PROD) up --build

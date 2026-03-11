@@ -1,0 +1,36 @@
+services:
+  traefik:
+    image: traefik:v3.6.10
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  app:
+    build:
+      target: dev
+    user: "${UID}:${GID}"
+    labels:
+      - "traefik.enable=true"
+      # Routes all traffic starting with /api to this container
+      - "traefik.http.routers.app.rule=PathPrefix(`/api`)"
+      # Define a middleware to strip the "/api" prefix before sending to Go
+      - "traefik.http.middlewares.api-strip.stripprefix.prefixes=/api"
+      # Apply that middleware to this router
+      - "traefik.http.routers.app.middlewares=api-strip"
+      - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.services.app.loadbalancer.server.port=8100"
+
+  frontend:
+    build:
+      target: dev
+    user: "${UID}:${GID}"
+    labels:
+      - "traefik.enable=true"
+      # Routes everything else to the Vite frontend
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"

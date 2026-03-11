@@ -58,19 +58,24 @@
 
   security.sudo.wheelNeedsPassword = false;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.spike = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAJQBFiMKa0qz8r/pxFCOxojRiJCsOSMRtTKMflXpqb7"
-    ];
+  users.users = {
+    spike = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAJQBFiMKa0qz8r/pxFCOxojRiJCsOSMRtTKMflXpqb7"
+      ];
+    };
+
+    chatapp = {
+      isNormalUser = true;
+      extraGroups = [ "docker" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAJQBFiMKa0qz8r/pxFCOxojRiJCsOSMRtTKMflXpqb7"
+      ];
+    };
   };
 
-  # programs.firefox.enable = true;
-
-  # List packages installed in system profile.
-  # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     vim
     wget
@@ -97,6 +102,9 @@
   };
 
   systemd.network.enable = true;
+  
+  virtualisation.docker.enable = true;
+
   #systemd.network.networks."10-wan" = {
   #  matchConfig.Name = "enp1s0"; # either ens3 or enp1s0 depending on system, check 'ip addr'
   #  networkConfig.DHCP = "ipv4";
